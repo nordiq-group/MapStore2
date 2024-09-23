@@ -16,7 +16,7 @@ import InfoPopover from '../../widgets/widget/InfoPopover';
 import { FormControl as FC, Form, Col, FormGroup, ControlLabel, Alert } from "react-bootstrap";
 
 import localizedProps from '../../misc/enhancers/localizedProps';
-import {defaultPlaceholder, isValidURL} from "./MainFormUtils";
+import {isValidURL} from "./MainFormUtils";
 
 const FormControl = localizedProps('placeholder')(FC);
 
@@ -24,9 +24,7 @@ const CUSTOM = "custom";
 const TMS = "tms";
 
 const DefaultURLEditor = ({ service = {}, onChangeUrl = () => { } }) => {
-
     return (
-
         <FormGroup controlId="URL">
             <Col xs={12}>
                 <ControlLabel><Message msgId="catalog.url"/></ControlLabel>
@@ -35,7 +33,7 @@ const DefaultURLEditor = ({ service = {}, onChangeUrl = () => { } }) => {
                     style={{
                         textOverflow: "ellipsis"
                     }}
-                    placeholder={defaultPlaceholder(service)}
+                    placeholder={"catalog.urlPlaceHolders." + service.type}
                     value={service && service.url}
                     onChange={(e) => onChangeUrl(e.target.value)}/>
             </Col>
@@ -101,7 +99,7 @@ const TmsURLEditor = ({ serviceTypes = [], onChangeServiceProperty, service = {}
                             style={{
                                 textOverflow: "ellipsis"
                             }}
-                            placeholder={defaultPlaceholder(service)}
+                            placeholder="catalog.urlPlaceHolders.tms"
                             value={service && service.url}
                             onChange={(e) => onChangeUrl(e.target.value)} />
                     </React.Fragment>
@@ -121,7 +119,7 @@ const COGEditor = ({ service = {}, onChangeServiceProperty = () => { } }) => {
                     style={{
                         textOverflow: "ellipsis"
                     }}
-                    placeholder={defaultPlaceholder(service)}
+                    placeholder="catalog.urlPlaceHolders.cog"
                     value={service && service.records && service.records.map(record => record?.url)?.join(',')}
                     onChange={(e) => {
                         let urls = e.target.value || "";
