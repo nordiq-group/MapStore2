@@ -16,7 +16,8 @@ import {
     updateLayerOnLayerPropertiesChange,
     updateLayerOnLoadingErrorChange,
     updateDependenciesMapOnMapSwitch,
-    onWidgetCreationFromMap
+    onWidgetCreationFromMap,
+    onMapEditorOpenEpic
 } from '../widgets';
 
 import {
@@ -31,15 +32,16 @@ import {
     DEPENDENCY_SELECTOR_KEY,
     updateWidgetProperty,
     REPLACE,
-    onEditorChange
+    onEditorChange,
+    UPDATE_PROPERTY
 } from '../../actions/widgets';
 
-import { savingMap, mapCreated } from '../../actions/maps';
 import { configureMap } from '../../actions/config';
 import { changeLayerProperties, layerLoad, layerError, updateNode } from '../../actions/layers';
 import { onLocationChanged } from 'connected-react-router';
 import { ActionsObservable } from 'redux-observable';
 import Rx from 'rxjs';
+import { HIDE, save } from '../../actions/mapEditor';
 
 describe('widgets Epics', () => {
     it('clearWidgetsOnLocationChange triggers CLEAR_WIDGETS on LOCATION_CHANGE', (done) => {
@@ -70,99 +72,19 @@ describe('widgets Epics', () => {
                     };
             });
     });
-    it('clearWidgetsOnLocationChange does not trigger CLEAR_WIDGETS when change maptype', (done) => {
-        const checkActions = actions => {
-            expect(actions.length).toBe(1);
-            const action = actions[0];
-            expect(action.type).toBe(CLEAR_WIDGETS);
-            done();
-        };
-        let count = 0;
-        testEpic(clearWidgetsOnLocationChange,
-            1,
-            [configureMap(), onLocationChanged({
-                pathname: "newPath"
-            })],
-            checkActions,
-            () => {
-                return count++
-                    ? {
-                        router: {
-                            location: { pathname: "new-map-type/3012"}
-                        }
-                    }
-                    : {
-                        router: {
-                            location: { pathname: "old-map-type/2013"}
-                        }
-                    };
-            });
-    });
-    it('clearWidgetsOnLocationChange stops CLEAR_WIDGETS triggers if saving', (done) => {
+    it('clearWidgetsOnLocationChange does not trigger CLEAR_WIDGETS on replace location', (done) => {
         const checkActions = actions => {
             expect(actions.length).toBe(1);
             const action = actions[0];
             expect(action.type).toBe(TEST_TIMEOUT);
             done();
         };
-        let count = 0;
         testEpic(addTimeoutEpic(clearWidgetsOnLocationChange, 20),
             1,
-            [
-                configureMap(),
-                savingMap(),
-                onLocationChanged({
-                    pathname: "newPath"
-                })
-            ],
-            checkActions,
-            () => {
-                return count++
-                    ? {
-                        router: {
-                            location: { pathname: "new/3012"}
-                        }
-                    }
-                    : {
-                        router: {
-                            location: { pathname: "old/2013"}
-                        }
-                    };
-            });
-    });
-    it('clearWidgetsOnLocationChange restores CLEAR_WIDGETS triggers after save completed', (done) => {
-        const checkActions = actions => {
-            expect(actions.length).toBe(1);
-            const action = actions[0];
-            expect(action.type).toBe(CLEAR_WIDGETS);
-            done();
-        };
-        let count = 0;
-        testEpic(clearWidgetsOnLocationChange,
-            1,
-            [configureMap(),
-                savingMap(),
-                onLocationChanged({
-                    pathname: "newPath"
-                }),
-                mapCreated(),
-                onLocationChanged({
-                    pathname: "newPath"
-                })],
-            checkActions,
-            () => {
-                return count++
-                    ? {
-                        router: {
-                            location: { pathname: "new/3012"}
-                        }
-                    }
-                    : {
-                        router: {
-                            location: { pathname: "old/2013"}
-                        }
-                    };
-            });
+            [configureMap(), onLocationChanged({
+                pathname: "newPath"
+            }, 'REPLACE')],
+            checkActions);
     });
     it('alignDependenciesToWidgets triggered on insertWidget', (done) => {
         const checkActions = actions => {
@@ -754,5 +676,61 @@ describe('widgets Epics', () => {
             1,
             [onEditorChange("widgetType", "chart")],
             checkActions, state);
+    });
+    it('onMapEditorOpenEpic triggers updateWidgetProperty and hide on SAVE with widgetId', (done) => {
+        const checkActions = actions => {
+            expect(actions.length).toBe(2);
+            expect(actions[0].type).toBe(UPDATE_PROPERTY);
+            expect(actions[0].id).toBe("widget-123");
+            expect(actions[0].key).toBe("maps");
+            expect(actions[0].value).toEqual({
+                widgetId: "widget-123",
+                mapId: "map-456",
+                layers: ["layer1", "layer2"],
+                center: { x: 0, y: 0, crs: "EPSG:4326" },
+                zoom: 5
+            });
+            expect(actions[0].mode).toBe("merge");
+            expect(actions[1].type).toBe(HIDE);
+            expect(actions[1].owner).toBe("widgetInlineEditor");
+            done();
+        };
+        const mapData = {
+            widgetId: "widget-123",
+            mapId: "map-456",
+            layers: ["layer1", "layer2"],
+            center: { x: 0, y: 0, crs: "EPSG:4326" },
+            zoom: 5
+        };
+        testEpic(onMapEditorOpenEpic,
+            2,
+            [save(mapData, "widgetInlineEditor")],
+            checkActions);
+    });
+    it('onMapEditorOpenEpic does not trigger actions when map has no widgetId', (done) => {
+        const checkActions = actions => {
+            expect(actions.length).toBe(0);
+            done();
+        };
+        const mapData = {
+            mapId: "map-456",
+            layers: ["layer1", "layer2"],
+            center: { x: 0, y: 0, crs: "EPSG:4326" },
+            zoom: 5
+        };
+        testEpic(onMapEditorOpenEpic,
+            0,
+            [save(mapData, "widgetInlineEditor")],
+            checkActions);
+    });
+    it('onMapEditorOpenEpic does not trigger actions when map is undefined', (done) => {
+        const checkActions = actions => {
+            expect(actions.length).toBe(0);
+            done();
+        };
+        testEpic(onMapEditorOpenEpic,
+            0,
+            [save(undefined, "widgetInlineEditor")],
+            checkActions);
     });
 });

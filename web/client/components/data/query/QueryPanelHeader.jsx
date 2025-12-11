@@ -1,21 +1,29 @@
 import React from 'react';
 import { Glyphicon } from 'react-bootstrap';
 
-import Message from '../../I18N/Message';
-import popoverTooltip from '../../misc/enhancers/popover';
+import HTML from '../../I18N/HTML';
+import AlertPopover from '../../misc/AlertPopover';
 import Button from '../../misc/Button';
+import FlexBox from '../../layout/FlexBox';
 
-const AlertIcon = popoverTooltip((props) => (<div className="square-button pull-right no-border" style={{display: 'flex'}} {...props}><Glyphicon glyph="exclamation-mark" className="text-danger"/></div>));
-
-export default ({loadingError, onToggleQuery = () => {}, buttonStyle = "default"} = {}) => (<div className="mapstore-block-width">
+export default ({loadingError, onToggleQuery = () => {}, buttonStyle = "default"} = {}) => (<FlexBox centerChildrenVertically gap="sm" classNames={['_padding-sm']}>
+    {loadingError ? (
+        <AlertPopover
+            show={loadingError}
+            content={<HTML msgId="queryform.loadingError"/>}
+            autoDismissSeconds={5}
+            placement="right"
+        />
+    ) : (
+        <div className="square-button-md _border-transparent" style={{display: 'flex'}}><Glyphicon glyph="filter"/></div>
+    )}
+    <FlexBox.Fill />
     <Button
         id="toc-query-close-button"
         key="menu-button"
-        className="square-button no-border"
+        className="square-button-md _border-transparent"
         bsStyle={buttonStyle}
         onClick={() => onToggleQuery()}>
-        <Glyphicon glyph="arrow-left"/>
+        <Glyphicon glyph="1-close"/>
     </Button>
-    {loadingError && (<AlertIcon popover={{text: (<Message msgId="queryform.loadingError"/>)}}/>) || (
-        <div className="square-button pull-right no-border" style={{display: 'flex'}}><Glyphicon glyph="filter" className="text-primary"/></div>)}
-</div>);
+</FlexBox>);

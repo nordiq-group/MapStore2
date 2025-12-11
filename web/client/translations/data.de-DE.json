@@ -60,9 +60,20 @@
       "title": "Infos zu diesem Inhalt",
       "tooltip": "Infos zu diesem Inhalt"
     },
-    "showEmptyMessageGFI": "Nachricht mit leeren Ergebnissen anzeigen",
+    "showEmptyMessageGFI": "Zeige Nachricht an, wenn keine Objekte/Informationen vorhanden sind",
     "remove": "Löschen",
     "removeThumbnail": "Miniaturbild entfernen",
+    "securityPopup": {
+      "insertCredentials": "Klicken Sie hier, um Anmeldeinformationen hinzuzufügen und diesen Dienst zu schützen",
+      "updateCredentials": "Klicken Sie hier, um die Anmeldeinformationen für diesen geschützten Dienst zu aktualisieren",
+      "username": "Benutzername",
+      "pwd": "Passwort",
+      "show": "Anzeigen",
+      "hide": "Ausblenden",
+      "serviceUrl": "Dienst-URL",
+      "title": "Geschützter Dienst",
+      "remove": "Schutz für diesen Dienst entfernen und das Modalfenster schließen"
+    },
     "layerProperties": {
       "windowTitle": "Ebenen Eigenschaften",
       "title": "Titel",
@@ -170,7 +181,9 @@
           "eyeDomeLighting": "Beleuchtung aktivieren",
           "eyeDomeLightingStrength": "Lichtstärke",
           "eyeDomeLightingRadius": "Beleuchtungsradius"
-        }
+        },
+        "enableImageryOverlay": "Überlagerung von Bildebenen aktivieren",
+        "enableImageryOverlayInfo": "Hinweis: Aktiviert Bildebenen wie WMS, TMS oder WMTS, die über der 3D-Tiles-Ebene gerendert und in der festgelegten Reihenfolge angezeigt werden."
       },
       "modelLayer": {
         "modelCenterLat": "Breitengrad des Zentrums (DD)",
@@ -204,9 +217,13 @@
       },
       "enableInteractiveLegendInfo": {
         "label": "Aktivieren Sie die interaktive Legende",
-        "info": "Wenn diese Option aktiviert ist, kann der Filter nach Legende angewendet werden, indem im Inhaltsverzeichnis auf Legendenelemente dieser Ebene geklickt wird. Hinweis: Diese Einstellung benötigt spezifische Konfigurationen im GeoServer",
+        "info": "Wenn diese Option aktiviert ist, kann der Filter nach Legende angewendet werden, indem im Inhaltsverzeichnis auf Legendenelemente dieser Ebene geklickt wird. Zusätzlich wird auch die dynamische Legende aktiviert. Hinweis: Dieser Parameter erfordert spezifische Konfigurationen im GeoServer",
         "infoWithoutGSNote": "Wenn diese Option aktiviert ist, kann der Filter nach Legende angewendet werden, indem im Inhaltsverzeichnis auf Legendenelemente dieser Ebene geklickt wird.",
         "fetchError": "Die Legenden Informationen konnten nicht vom Dienst abgerufen werden"
+      },
+      "enableDynamicLegend": {
+        "label": "Dynamische Legende aktivieren",
+        "info": "Wenn diese Option aktiviert ist, wird die Legende basierend auf dem Kartenansichtsfenster und den Ebenenfiltern aktualisiert"
       },
       "enableLocalizedLayerStyles": {
         "label": "Lokalisierten Stil aktivieren",
@@ -440,7 +457,11 @@
       "theme_combo": "Thema wählen:",
       "maps_title": "Karten",
       "locales_combo": "Sprache:",
-      "featuredMaps": "Empfohlene Karten"
+      "featuredMaps": "Empfohlene Karten",
+      "groupmanagerTab": "Gruppen",
+      "usermanagerTab": "Benutzer",
+      "tagsmanagerTab": "Schlagwörter",
+      "ipmanagerTab": "IP-Bereiche"
     },
     "newMap": "Neue Karte",
     "newMapEmpty": "Leere Karte",
@@ -565,7 +586,8 @@
           "sunlightOption": "Sonnenlicht",
           "dateTimeOption": "Spezifisches UTC-Datum-Uhrzeit",
           "dateTimePlaceholder": "Wählen Sie Datum und Uhrzeit"
-        }
+        },
+        "collisionDetection": "Geländekollisionserkennung aktivieren"
       },
       "thumbnailError": {
         "error403": "Sie haben keine Berechtigung um Miniaturansichten hochzuladen",
@@ -821,7 +843,8 @@
       "projection": "Koordinatensystem",
       "projectionmismatch": "Nichtübereinstimmung des Koordinatensystems zwischen gedruckter und Bildschirmkarte",
       "graticule": "Raster mit Etiketten hinzufügen",
-      "additionalLayers": "Überlagerungen einschließen"
+      "additionalLayers": "Überlagerungen einschließen",
+      "createScaleOption": "Neue Skala zur Liste hinzufügen"
     },
     "backgroundSwitcher": {
       "tooltip": "Wähle Hintergrund"
@@ -1005,7 +1028,11 @@
         "showTooltipActive": "Erweiterte Filter anzeigen (aktiv)",
         "hideTooltip": "Erweiterte Filter ausblenden",
         "hideTooltipActive": "Erweiterte Filter ausblenden (aktiv)"
-      }
+      },
+      "addDestination": "Ziel hinzufügen",
+      "searching": "Suche läuft...",
+      "noResultsFound": "Keine Ergebnisse gefunden",
+      "searchByLocationName": "Nach Ortsnamen suchen..."
     },
     "draw": {
       "fill": "Füllung",
@@ -1268,6 +1295,8 @@
         "targetLayer": "Zielebene",
         "clear": "Filter löschen",
         "operation": "Geometrische Operation",
+        "areaOfInterest": "Interessengebiet",
+        "areaOfInterestTooltip": "Verwenden Sie dasselbe Interessengebiet der Ebene",
         "placeholder": "Wählen Sie eine Ebene aus",
         "errors": {
           "noCrossLayerAvailable": "Ebenenfilter ist für die ausgewählte Ebene nicht verfügbar",
@@ -1278,7 +1307,7 @@
       "changedFilterAlert": "Es gibt ungespeicherte Änderungen. Möchten Sie diese speichern?",
       "resetFilter": "Filter entfernen",
       "confirmReset": "Bestätigen",
-      "loadingError": "Der aktuelle Filter verursachte ein Rendering-Problem der Ebene auf der Karte. Bitte überprüfen Sie die Ebenenkonfiguration auf dem Server oder korrigieren Sie den Filter",
+      "loadingError": "<div><p><strong>Rendering-Problem: Der aktuelle Filter könnte die Ursache sein.</strong></p><p>Mögliche Ursachen:</p><ul><li>Verbindungsprobleme oder ungültige Filtereinstellungen.</li><li><strong>Speicherlimit erreicht:</strong> Wenn Sie den Layer-Filter verwenden, hat der Vorgang möglicherweise die zulässige Speichernutzung überschritten.</li></ul><p><strong>Was Sie tun können:</strong></p><ul><li>Überprüfen Sie Ihre Verbindung und Filtereinstellungen.</li><li><strong>Wenn Sie den Layer-Filter verwenden:</strong> Versuchen Sie, die Anzahl oder die Komplexität der im Filter enthaltenen Geometrien zu reduzieren, z. B. durch Reduzieren des Interessenbereichs und Sicherstellen, dass der Interessenbereich auch im Layer-Filter-Tool aktiviert ist.</li></ul></div>",
       "changedFilterWithErrorAlert": "Der Filter verursacht einen Ebenen-Rendering-Fehler. Möchten Sie ihn trotzdem speichern?"
     },
     "annotations": {
@@ -1433,14 +1462,19 @@
       "userCreated": "Erstellt!",
       "deleting": "Löschen...",
       "delete": "Löschen",
-      "confirmDeleteUser": "Sind Sie sicher, das Sie diesen Benutzer löschen möchten?",
+      "confirmDeleteUser": "Sind Sie sicher, das Sie diesen Benutzer löschen \"{title}\" möchten?",
       "errorDelete": "Es gab einen Fehler beim Löschen von Benutzer:",
       "errorSaving": "Es gab einen Fehler beim Speichern von Benutzer:",
       "selectedGroups": "Ausgewählte Gruppen",
-      "requiredFiedsMessage": "Felder, welche mit einem Sternchen (*) markiert sind, sind Pflichtfelder"
+      "requiredFiedsMessage": "Felder, welche mit einem Sternchen (*) markiert sind, sind Pflichtfelder",
+      "usersFound": "{count, plural, =0 {0 Benutzer gefunden} =1 {1 Benutzer gefunden} other {# Benutzer gefunden}}",
+      "admin": "Administrator",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
     },
     "usergroups": {
-      "searchGroups": "Suche Gruppen...",
+      "title": "Gruppen Verwalten",
+      "searchGroups": "Suche gruppen...",
       "groups": "Gruppen",
       "nameLimit": "Der Name ist auf 255 Zeichen limitiert.",
       "descLimit": "Die Beschreibung ist auf 255 Zeichen limitiert.",
@@ -1462,9 +1496,12 @@
       "noUsers": "Keine Benutzer für diese Gruppe gefunden",
       "errorSaving": "Es gab einen Fehler beim Speichern dieser Gruppe",
       "errorDelete": "Es gab einen Fehler beim Löschen dieser Gruppe",
-      "confirmDeleteGroup": "Sind Sie sicher, das Sie diese Gruppe löschen möchten?",
+      "confirmDeleteGroup": "Sind Sie sicher, das Sie diese Gruppe löschen möchten \"{title}\" ?",
       "generalInformation": "Allgemein",
-      "members": "Mitglied"
+      "members": "Mitglied",
+      "userGroupsFound": "{count, plural, =0 {0 Gruppen gefunden} =1 {1 Gruppe gefunden} other {# Gruppen gefunden}}",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
     },
     "share": {
       "title": "Teilen",
@@ -1547,7 +1584,7 @@
       "title": "Snapshot Vorschau",
       "save": "Speichern",
       "tooltip": "Speichere einen Snapshot der Karte.",
-      "googleBingError": "Google und Bing Ebenen sind aufgrund urheberrechtlicher Einschränkungen für den Snapshot nicht verfügbar.",
+      "googleError": "Google-Ebenen sind aufgrund urheberrechtlicher Einschränkungen für den Snapshot nicht verfügbar.",
       "downloadingSnapshots": "Snapshot Erstellung...",
       "date": "Datum",
       "layers": "Ebenen",
@@ -1997,12 +2034,25 @@
           "loadingStrategy": "Ladestrategie"
         },
         "disableViewportFilter": "Daten nicht nach dem aktuellen Darstellungsbereich filtern",
-        "enableViewportFilter": "Filtern Sie Daten nach dem aktuellen Ansichtsfenster"
+        "enableViewportFilter": "Filtern Sie Daten nach dem aktuellen Ansichtsfenster",
+        "validationError": "Es gibt Validierungsfehler bei den angewendeten Änderungen. Bitte überprüfen Sie die geänderten Werte vor dem Speichern."
+      },
+      "primaryKey": {
+        "tooltip": "Dieses Feld ist eine Primärschlüssel und kann nicht bearbeitet werden"
+      },
+      "restrictions": {
+        "required": "Dieses Attribut ist erforderlich.",
+        "range": "Der Wert muss größer oder gleich {minimum} und kleiner oder gleich {maximum} sein.",
+        "greaterEqualThan": "Der Wert muss größer oder gleich {minimum} sein.",
+        "lessEqualThan": "Der Wert muss kleiner oder gleich {maximum} sein.",
+        "options": "Der Wert muss einer der folgenden sein: {options}.",
+        "nillable": "Der Wert kann null sein."
       }
     },
     "layerdownload": {
       "title": "Daten exportieren",
       "service": "Service",
+      "downloadMode": "Export modus",
       "format": "Dateiformat",
       "srs": "Räumliches Bezugssystem",
       "export": "Export",
@@ -2032,6 +2082,16 @@
         "executeProcessXhrFailed": "ExecuteProcess-Anforderung fehlgeschlagen! Der Server ist möglicherweise falsch konfiguriert oder nicht mehr erreichbar",
         "getExecutionStatusXhrFailed": "GetExecutionStatus-Anforderung fehlgeschlagen! Der Server ist möglicherweise falsch konfiguriert oder nicht mehr erreichbar",
         "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+      },
+      "services": {
+        "wps": {
+          "title": "Asynchron (WPS)",
+          "tooltip": "Der asynchrone Modus mit WPS (Web Processing Service) funktioniert durch Ausführen eines entfernten Prozesses; sobald die Verarbeitung abgeschlossen ist, erhältst du eine Benachrichtigung mit einem Link zum Herunterladen der Daten."
+        },
+        "wfs": {
+          "title": "Synchron (WFS)",
+          "tooltip": "Der synchrone Download mit WFS (Web Feature Service), geeignet für kleine Datensätze, funktioniert durch das Senden einer Anfrage, die sofort eine Vektordatei zurückgibt."
+        }
       },
       "noSupportedServiceFound": "Der Server unterstützt keinen WFS- oder WPS-Download für diese Ebene!"
     },
@@ -2136,6 +2196,7 @@
           "useTheSelectedLayer": "Verwende die ausgewählte Ebene",
           "connectToAMap": "Stellen Sie eine Verbindung zu einem anderen Widget her",
           "connectToTheMap": "Verbinden Sie sich mit der Karte",
+          "connectToTheTable": "Verbinden Sie sich mit der Tabelle",
           "selectMapToConnect": "Wählen Sie das zu verbindende Widget aus",
           "clearConnection": "Verbindung löschen",
           "disableConnectToMap": "Vorgang nicht verfügbar",
@@ -2204,7 +2265,8 @@
           "hide": "Verbergen",
           "hideDescription": "Verstecken Sie dieses Widget für andere Benutzer",
           "unhide": "Einblenden",
-          "unhideDescription": "Blenden Sie das Widget für andere Benutzer ein"
+          "unhideDescription": "Blenden Sie das Widget für andere Benutzer ein",
+          "advancedMapEditor": "Karteneditor öffnen"
         }
       },
       "mapSwitcher": {
@@ -2213,6 +2275,15 @@
         "selectLabel": "Wählen Sie eine Karte aus",
         "infoOnHide": "Erweitern Sie das Widget, um den Kartenwechsler anzuzeigen",
         "subTitle": "<p>Für die Mehrfachauswahl<br>verwenden Sie unter Windows STRG + Klicken <br> und unter Mac verwenden Sie Strg + Klicken</p>"
+      },
+      "mapWidget": {
+        "showBackgroundSelector": "Hintergrundselektor anzeigen",
+        "showLegend": "Legende anzeigen",
+        "legendAlreadyExists": "Eine Legende-Widget für das Karten-Widget existiert bereits",
+        "mapEditorTitle": "Karten-Widget-Editor"
+      },
+      "legendWidget": {
+        "mapAlreadyHasLegend": "Das ausgewählte Karten-Widget hat bereits eine Legende im Karten-Viewer"
       },
       "chartSwitcher": {
         "noResults": "Keine Ebene gefunden",
@@ -2334,6 +2405,14 @@
         "traceAxes": "Achsen verfolgen",
         "traceData": "Trace-Daten",
         "traceLegendOptions": "Optionen für Tracelegende",
+        "nullManagement": "Null-Wert-Behandlung",
+        "groupByNullHandlingStrategyTitle": "Für das Feld '{groupByAttribute}'",
+        "nullHandlingStrategy": "Strategie",
+        "nullHandlingStrategyHelp": "<p>Wählen Sie, wie Nullwerte behandelt werden sollen:</p><ul><li><strong>Ignorieren (Standard):</strong> Behalten Sie Nullwerte unverändert in Ihren Daten</li><li><strong>Ausschließen:</strong> Entfernen Sie alle Datensätze, bei denen der Wert null ist</li><li><strong>Platzhalter verwenden:</strong> Ersetzen Sie Nullwerte durch einen benutzerdefinierten Wert Ihrer Wahl</li></ul>",
+        "nullHandlingPlaceholder": "Platzhalterwert",
+        "nullHandlingStrategyDefault": "Ignorieren (Standard)",
+        "nullHandlingStrategyExclude": "Ausschließen",
+        "nullHandlingStrategyPlaceholder": "Platzhalter verwenden",
         "traces": "Spuren",
         "axes": "Achsen",
         "traceStyle": "Trace-Stil",
@@ -2358,7 +2437,8 @@
           "category": "Kategorie",
           "log": "Logarithmus",
           "date": "Datum"
-        }
+        },
+        "showCurrentTime": "Aktuelle Zeit auf der Achse anzeigen"
       },
       "tray": {
         "title": "Widgets",
@@ -2406,7 +2486,17 @@
         "hideConnections": "Verbindungen ausblenden"
       },
       "emptyTitle": "Das Dashboard ist leer",
-      "delete": "Dashboard löschen"
+      "delete": "Dashboard löschen",
+      "view": {
+        "delete": "Löschen",
+        "configure": "Konfigurieren",
+        "moveRight": "Nach rechts verschieben",
+        "moveLeft": "Nach links verschieben",
+        "removeConfirmTitle": "Bist du sicher?",
+        "removeConfirmContent": "Möchtest du diese Ansicht vom Dashboard entfernen?",
+        "name": "Name",
+        "color": "Farbe"
+      }
     },
     "dashboardEmbedded": {
       "loadingSpinner": "Dashboard wird geladen",
@@ -2766,7 +2856,8 @@
       "minSourceValue": "Mindestwert der Quelldaten",
       "maxSourceValue": "Maximaler Quelldatenwert",
       "customParams": "Benutzerdefinierte Parameter",
-      "wrongFormatMsg": "Die eingegebene Konfiguration ist in falschem Format !!"
+      "wrongFormatMsg": "Die eingegebene Konfiguration ist in falschem Format !!",
+      "style": "Stil Regel"
     },
     "playback": {
       "settings": {
@@ -2860,8 +2951,18 @@
       "avstyle": "Verfügbare Stile",
       "clearbtn": "Alles Löschen",
       "selectbtn": "Alle auswählen",
+      "gsInstanceGrid": {
+        "name": "GS-Name",
+        "description": "Beschreibung",
+        "url": "GS-URL"
+      },
+      "tabs": {
+        "rules": "Regeln",
+        "gsInstances": "GS-Instanzen"
+      },
       "placeholders": {
         "filter": "Suche...",
+        "gsInstances": "GS-Instanz auswählen",
         "role": "Nach Rollen suchen",
         "user": "Benutzer suchen",
         "service": "Suchdienste",
@@ -2873,17 +2974,29 @@
         "ipRange": "###.###.#.#",
         "priority": "Priorität festlegen",
         "validityPeriod": "Gültigkeitszeitraum auswählen",
-        "filterAny": "beliebig"
+        "filterAny": "beliebig",
+        "gsInstanceName": "Geben Sie den GS-Instanznamen ein",
+        "gsInstanceDescription": "Geben Sie die Beschreibung der GS-Instanz ein",
+        "gsInstanceURL": "Geben Sie die URL der GS-Instanz ein",
+        "gsInstanceUsername": "Geben Sie den Benutzernamen der GS-Instanz ein",
+        "gsInstancePassword": "Geben Sie das GS-Instanzkennwort ein",
+        "clearValueText": "Auswahl aufheben",
+        "noResultsText": "keine Ergebnisse gefunden"
       },
       "menutitle": "GeoFence-Regeln Verwalten",
       "tooltip": {
         "addT": "Fügen Sie eine Regel hinzu",
+        "addGSInstance": "Eine GS-Instanz hinzufügen",
         "editT": "Bearbeiten Sie die ausgewählte Regel",
+        "editGSInstance": "Bearbeiten einer GS-Instanz",
         "addBeT": "Fügen Sie eine neue Regel über der Ausgewählten hinzu",
         "addAfT": "Fügen Sie eine neue Regel unter der Ausgewählten hinzu",
         "deleteT": "Entferne ausgewählte Regeln",
+        "deleteGSInstance": "Ausgewählte GS-Instanzen entfernen",
         "cacheT": "Cache leeren",
         "save": "Aktuelle Regel speichern",
+        "saveGSInstance": "Aktuelle GS-Instanz speichern",
+        "closeGSInstance": "Beenden Sie die Erstellung der GS-Instanz",
         "close": "Beenden Sie die Regelerstellung",
         "showAllRules": "Derzeit zeigt die Tabelle nur die Regeln an, die genau mit dem für dieses Feld angegebenen Wert übereinstimmen. Deaktivieren Sie diese Option, um auch die Regeln einzuschließen, bei denen dieser Wert nicht vorhanden ist.",
         "filterRuleList": "Derzeit zeigt die Tabelle alle Regeln an, die für diese Bedingung gelten, auch solche, bei denen dieser Wert nicht festgelegt ist. Wählen Sie diese Option, um nur die Regeln anzuzeigen, die speziell für diesen Wert gelten.",
@@ -2891,19 +3004,31 @@
       },
       "navItems": {
         "main": "Allgemeine Regel",
+        "mainGSInstance": "Allgemeine GS-Instanz",
         "style": "Stil Regel",
         "filter": "Filter Regel",
         "attribute": "Attribut Regel"
+      },
+      "gsInstanceInputs": {
+        "name": "GS-Name",
+        "description": "GS-Beschreibung",
+        "url": "GS-URL",
+        "username": "Benutzername",
+        "password": "Passwort"
       },
       "rule": "Regel",
       "cachetitle": "Cache leeren",
       "cachemsg": "Möchten Sie den GeoFence-Cache wirklich löschen?",
       "deltitle": "Regel Löschen",
+      "delGSInstancetitle": "GS-Instanz löschen",
+      "saveGSInstancetitle": "GS-Instanz speichern",
       "delmsg": "Möchten Sie diese Regel wirklich löschen?",
+      "delGSInstancemsg": "Möchten Sie die GS-Instanz wirklich löschen?",
       "invalidForm": "Das Formular ist ungültig. Überprüfen Sie die Felderwerte",
       "ip": "IP",
       "title": "Zugangs Regeln",
       "role": "Rolle",
+      "gsInstance": "GS-Instanz",
       "user": "Benutzer",
       "priority": "Priorität",
       "service": "Service",
@@ -2935,11 +3060,18 @@
       "errorLoadingWorkspaces": "Fehler beim Laden der Arbeitsbereiche.",
       "errorLoadingLayers": "Fehler beim Laden der Ebenen.",
       "errorLoadingRules": "Fehler beim Laden der Regeln.",
+      "errorLoadingGSInstances": "Fehler beim Laden der GS-Instanzen.",
       "errorMovingRules": "Fehler beim Verschieben der Regeln.",
       "errorDeletingRules": "Fehler beim Löschen der Regeln.",
       "errorAddingRule": "Fehler beim Hinzufügen der Regel.",
       "errorUpdatingRule": "Fehler beim Ändern der Regel.",
       "errorDuplicateRule": "Duplizierte Regel",
+      "errorUpdatingGSInstance": "Fehler beim Speichern der GS-Instanz.",
+      "errorDuplicateGSInstance": "Duplizierte GS-Instanz.",
+      "errorDeleteGSInstance": "Fehler beim Löschen von GS-Instanzen.",
+      "errorDeleteGSInstanceWithExistRelRules": "Fehler: Es gibt verknüpfte Regeln für die GS-Instanz \"{gsInstanceTitle}\". Löschen Sie diese zuerst.",
+      "successDeleteGSInstance": "{successfulNum} {successItemLabel} erfolgreich gelöscht {failureMsg}",
+      "successSavedGSInstance": "GS-Instanz wurde erfolgreich gespeichert.",
       "errorLoading": "Ladefehler",
       "deleteModal": "Regeln löschen",
       "selectedRulesDelete": "Ausgewählte Regeln löschen ?",
@@ -3258,7 +3390,44 @@
       "addTooltip": "Neuen Hintergrund hinzufügen",
       "editTooltip": "Hintergrund bearbeiten",
       "deleteTooltip": "Hintergrund löschen",
-      "confirmDelete": "Möchten Sie den \"{title}\" - Hintergrund wirklich löschen?"
+      "addTerrainTooltip": "Neues Gelände hinzufügen",
+      "editTerrainTooltip": "Gelände bearbeiten",
+      "deleteTerrainTooltip": "Gelände löschen",
+      "confirmDelete": "Möchten Sie den \"{title}\" - Hintergrund wirklich löschen?",
+      "backgroundIncompatibleTooltip": "Diese Hintergrundebene ist nicht mit der aktuellen Kartenprojektion kompatibel",
+      "terrain": {
+        "placeholders": {
+          "titleLabel": "Titel eingeben...",
+          "urlLabel": "URL eingeben...",
+          "assetId": "Asset-ID eingeben...",
+          "accessToken": "Zugriffstoken eingeben...",
+          "server": "Server eingeben...",
+          "layernameLabel": "Ebenennamen eingeben..."
+        },
+        "invalidUrl": "Die angegebene URL ist ungültig",
+        "mainTitle": "Gelände",
+        "title": "Neues Gelände hinzufügen",
+        "providerLabel": "Anbieter",
+        "titleLabel": "Titel",
+        "cesiumProvider": {
+          "urlLabel": "URL",
+          "label": "Cesium"
+        },
+        "cesiumIonProvider": {
+          "label": "Cesium Ion",
+          "assetId": "Asset-ID",
+          "accessToken": "Zugriffstoken",
+          "server": "Server"
+        },
+        "wmsProvider": {
+          "label": "WMS",
+          "urlLabel": "URL",
+          "layernameLabel": "Ebenenname",
+          "projectionLabel": "Projektion",
+          "wmsVersionLabel": "WMS-Version"
+        },
+        "add": "Hinzufügen"
+      }
     },
     "stepper": {
       "back": "Zurück",
@@ -3486,6 +3655,14 @@
       "Language": {
         "description": "Ermöglicht das Ändern der Sprache der Benutzeroberfläche",
         "title": "Sprache"
+      },
+      "Itinerary": {
+        "description": "Dieses Plugin ermöglicht das Erstellen von Routen auf der Karte",
+        "title": "Itineraris"
+      },
+      "Isochrone": {
+        "description": "Dieses Plugin ermöglicht die Berechnung von Isochronen und Isodistanzen",
+        "title": "Isochrone"
       }
     },
     "contextCreator": {
@@ -4201,28 +4378,28 @@
       "emptyTitle": "Diese WPS-Prozesse müssen im Geoserver installiert sein, um diesen Prozess nutzen zu können:",
       "emptyDescription": "<ul><li>geo:buffer</li><li>gs:IntersectionFeatureCollection</li><li>gs:CollectGeometries</li></ul>",
       "sourceLayer": "Quellebene",
-      "sourceFeature": "Quellfunktion",
+      "sourceFeature": "Objekt aus der Quellebene",
       "tool": "Wählen Sie einen Prozess aus, den Sie verwenden möchten",
-      "highlight": "Markieren Sie Funktionen",
+      "highlight": "Markiere gewähltes Objekt in der Karte",
       "bufferTool": "Puffer",
       "distance": "Distanz",
       "distanceUom": "Maßeinheiten",
       "km": "km",
       "m": "m",
-      "run": "Laufen",
-      "intersectionTool": "Überschneidung",
+      "run": "Prozess starten",
+      "intersectionTool": "Verschneidung",
       "noMatchedLayer": "Keine Ebene entspricht dem aktuellen Filter",
       "noMatchedFeature": "Keine Funktion entspricht dem aktuellen Filter",
       "intersectionLayer": "Schnittebene",
-      "intersectionFeature": "Kreuzungsfunktion",
+      "intersectionFeature": "Objekt aus der Schnittebene",
       "advancedSettings": "Erweiterte Einstellungen",
       "quadrantSegments": "Quadrantensegmente",
       "quadrantSegmentsTooltip": "Anzahl der Segmente",
       "capStyle": "Stil",
       "capStyleTooltip": "Stil für die Pufferendkappen",
-      "round": "Runden",
-      "flat": "Wohnung",
-      "square": "Quadrat",
+      "round": "rund",
+      "flat": "flach",
+      "square": "quadratisch",
       "firstAttributeToRetain": "Erstes Attribut, das beibehalten werden soll",
       "secondAttributeToRetain": "Zweites Attribut, das beibehalten werden soll",
       "intersectionMode": "Kreuzungsmodus",
@@ -4256,22 +4433,22 @@
         "errorGettingFeaturesList": "Es war nicht möglich, die Liste der Features aus dem Layer abzurufen {layerName}"
       },
       "warningTitle": "Warnung",
-      "warningBody": "Sie haben keine Funktion ausgewählt und dies kann die Leistung im Geoserver verlangsamen. Möchten Sie fortfahren?",
+      "warningBody": "<p>Sie haben kein Objekt aus der Quellebene ausgewählt.<br/> Der Prozess wird daher auf alle Objekte im gewählten Layer durchgeführt.<br/><br/>Dies kann die Leistung im GeoServer verlangsamen.<br/><br/>Möchten Sie fortfahren?</p>",
       "warningConfirmText": "Ja",
       "warningCancel": "Abbrechen",
       "tooltip": {
-        "clickToSelectFeature": "Klicken, um Funktion auszuwählen",
+        "clickToSelectFeature": "Klicken, um ein Objekt aus der Karte zu wählen",
         "invalidLayers": "Eine der von Ihnen ausgewählten Ebenen kann in diesem Prozess nicht verwendet werden",
         "fillRequiredDataIntersection": "Bitte wählen Sie mindestens den Quell-Layer und den Schnittpunkt-Layer aus",
         "fillRequiredDataBuffer": "Bitte wählen Sie mindestens die Quellebene aus",
         "pointAndPolygon": "Sie können einen Punktlayer nur für den Schnittpunktlayer auswählen",
         "siderBarBtn": "Geoverarbeitung",
-        "selectFeature": "Bitte wählen Sie eine Funktion aus",
-        "validFeature": "Diese Funktion ist gültig",
+        "selectFeature": "Bitte wählen Sie ein Objekt aus",
+        "validFeature": "Diese Objekt ist gültig",
         "invalidFeature": "Diese Funktion ist ungültig",
         "selectLayer": "Bitte wählen Sie eine Ebene aus",
         "validLayer": "Diese Ebene ist gültig und kann in diesem Prozess verwendet werden",
-        "invalidLayer": "Dieser Layer unterstützt weder die erforderlichen WPS-Prozesse \ngeo:buffer\ngs:IntersectionFeatureCollection\ngs:CollectGeometries\n\noch handelt es sich um einen Raster-Layer."
+        "invalidLayer": "Dieser Layer unterstützt weder die erforderlichen WPS-Prozesse \ngeo:buffer\ngs:IntersectionFeatureCollection\ngs:CollectGeometries\nnoch handelt es sich um einen Raster-Layer."
       }
     },
     "resourcesCatalog": {
@@ -4306,6 +4483,14 @@
         "noPublicContentTitle": "Ausgewählte Ressourcen",
         "noPublicContentContent": "Dieser Katalog enthält keine ausgewählten Ressourcen."
       },
+      "groupsSection": {
+        "noContentYetTitle": "Keine Gruppen vorhanden",
+        "noContentYetContent": "Es sind keine Benutzergruppen vorhanden. Klicken Sie auf \"Neue Gruppe\", um eine zu erstellen"
+      },
+      "ipmanagerSection": {
+        "noContentYetTitle": "Noch keine IP-Bereiche registriert",
+        "noContentYetContent": " "
+      },
       "mapsFilter": "Karten",
       "dashboardsFilter": "Dashboards",
       "geostoriesFilter": "Geostories",
@@ -4332,12 +4517,14 @@
       "editPermission": "Bearbeiten",
       "ownerPermission": "Eigentümer",
       "groups": "Gruppen",
+      "ip": "IP-Bereiche",
       "filterBy": "Filtern...",
       "about": "Über",
       "readMore": "Mehr lesen",
       "readLess": "Weniger lesen",
       "noPermissionsAvailable": "Keine Berechtigung verfügbar",
       "noAbout": "Keine zusätzlichen Informationen zur Ressource",
+      "loadingAbout": "Lädt über...",
       "addResource": "Ressource hinzufügen",
       "createMap": "Karte erstellen",
       "createDashboard": "Dashboard erstellen",
@@ -4356,6 +4543,7 @@
       "filterMapsByContext": "Karten nach Kontext",
       "tags": "Tags",
       "deleteResource": "Löschen",
+      "editResource": "Bearbeiten",
       "deleteResourceTitle": "Möchten Sie diese Ressource wirklich löschen?",
       "deleteResourceDescription": "Diese Ressource und alle verknüpften Ressourcen werden gelöscht",
       "deleteResourceConfirm": "Löschen",
@@ -4377,6 +4565,9 @@
         "error409": "Eine Ressource mit diesem Namen existiert bereits",
         "error500": "Interner Serverfehler. Überprüfen Sie, ob die Größe der Ressourcenkonfigurationsdatei das festgelegte Limit überschreitet",
         "errorDefault": "Netzwerkfehler"
+      },
+      "resourceIssues": {
+        "dependencyMissing": "Fehlende Berechtigungen für eine zugehörige Ressource."
       },
       "deleteError": {
         "error403": "Sie dürfen die Ressource nicht löschen",
@@ -4412,7 +4603,8 @@
       "tagName": "Name",
       "tagDescription": "Beschreibung",
       "tagColor": "Farbe",
-      "manageTags": "Tags verwalten",
+      "manageTags": "Tags Verwalten",
+      "manageIPs": "IP-Bereiche verwalten",
       "errorLoadingTags": "Es ist nicht möglich, Tags zu laden",
       "errorUpdatingTag": "Es ist nicht möglich, das Tag zu aktualisieren",
       "errorTagNameAlreadyExist": "Das Tag, das Sie erstellen möchten, existiert bereits",
@@ -4421,7 +4613,118 @@
       "addToFavorites": "Zu Favoriten hinzufügen",
       "favorites": "Favoriten",
       "documentation": "Dokumentation",
-      "filterApplied": "Filter angewendet"
+      "filterApplied": "Filter angewendet",
+      "emptyFilterItems": "Keine Elemente zum Anzeigen"
+    },
+    "ipManager": {
+      "newIP": "Neuer IP-Bereich",
+      "editTitle": "IP-Bereich bearbeiten",
+      "editTooltip": "IP-Bereich bearbeiten",
+      "deleteTitle": "IP-Bereich löschen",
+      "deleteTooltip": "IP-Bereich löschen",
+      "deleteButton": "Löschen",
+      "deleteConfirm": "Möchten Sie diesen IP-Bereich wirklich löschen?",
+      "ipAddress": "IP-Bereich (CIDR-Format)",
+      "description": "Beschreibung",
+      "search": "IP-Bereiche durchsuchen...",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "ipsFound": "{count, plural, =0 {0 IP-Bereiche gefunden} =1 {1 IP-Bereich gefunden} other {# IP-Bereiche gefunden}}",
+      "validation": {
+        "ipRequired": "IP-Bereich ist erforderlich",
+        "cidrRequired": "CIDR-Notation erforderlich (z.B. 192.168.1.1/32 oder 192.168.1.0/24)",
+        "invalidMask": "Subnetzmaske muss zwischen 0 und 32 liegen",
+        "invalidFormat": "Ungültiges IP-Bereichsformat",
+        "invalidOctet": "Jedes Oktett muss zwischen 0 und 255 liegen"
+      },
+      "notification": {
+        "createSuccessTitle": "Erfolg",
+        "createSuccessMessage": "IP-Bereich erfolgreich erstellt",
+        "createErrorTitle": "Fehler",
+        "createErrorMessage": "IP-Bereich konnte nicht erstellt werden",
+        "updateSuccessTitle": "Erfolg",
+        "updateSuccessMessage": "IP-Bereich erfolgreich aktualisiert",
+        "updateErrorTitle": "Fehler",
+        "updateErrorMessage": "IP-Bereich konnte nicht aktualisiert werden",
+        "deleteSuccessTitle": "Erfolg",
+        "deleteSuccessMessage": "IP-Bereich erfolgreich gelöscht",
+        "deleteErrorTitle": "Fehler",
+        "deleteErrorMessage": "IP-Bereich konnte nicht gelöscht werden"
+      }
+    },
+    "itinerary": {
+      "title": "Reiseroute",
+      "tooltip": "Reiseroute",
+      "mode": "Reisemodus",
+      "modeTooltip": "Wählen Sie einen Reisemodus für die Reiseroute",
+      "optimize": "Optimieren",
+      "optimizeRoute": "Route optimieren",
+      "optimizeTooltip": "Aktivieren, um Punkte für die schnellste Route neu anzuordnen (begrenzt durch Route Optimization API)",
+      "avoid": "Vermeiden",
+      "avoidTooltip": "Optionen zum Vermeiden bestimmter Straßen umschalten",
+      "motorway": "Autobahnen & Schnellstraßen",
+      "trunk": "Bundesstraßen & Hauptverkehrsstraßen",
+      "ferry": "Fährüberfahrten",
+      "tunnel": "Tunnel & Unterführungen",
+      "bridge": "Brücken & Hochstraßen",
+      "run": "Starten",
+      "exportAsGeoJSON": "Als GeoJSON exportieren",
+      "viaRoute": "über {routeName}",
+      "clickOnMap": "Klicken Sie auf die Karte, um einen Ort auszuwählen",
+      "addAsLayer": "Als Ebene hinzufügen",
+      "routeItineraries": "Routenreiserouten",
+      "goThroughRoundabout": "Durch den Kreisverkehr fahren",
+      "reset": "Zurücksetzen",
+      "notification": {
+        "error": "Reiseroutenfehler",
+        "errorItineraryError": "Beim Berechnen der Reiseroute ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut...",
+        "infoLayerAdded": "Reiseroute als Ebene hinzugefügt"
+      },
+      "togglePointTooltip": "Koordinateneditor umschalten",
+      "toggleSearchTooltip": "Suche nach Ortsnamen umschalten",
+      "removeWaypointTooltip": "Wegpunkt entfernen"
+    },
+    "isochrone": {
+      "title": "Isochrone",
+      "tooltip": "Isochrone",
+      "modeTooltip": "Wählen Sie einen Reiseverkehrsmittel für die Isochrone/Isodistanz",
+      "rangeByTooltip": "Wählen Sie <i>Entfernung</i> für <b>Isodistanz</b> oder <i>Zeit</i> für <b>Isochrone</b> als Grundlage für den Bereich",
+      "clickOnMap": "Klicken Sie auf die Karte, um einen Standort auszuwählen",
+      "coordinateTooltip": "Koordinaten-Editor umschalten",
+      "searchTooltip": "Nach Standortname suchen",
+      "searching": "Suche...",
+      "newSearch": "Neue Suche",
+      "bucketsTooltip": "Definiert die Anzahl der Intervalle, die innerhalb des gewählten Bereichs berechnet werden sollen. Maximum ist 4.",
+      "noResultsFound": "Keine Ergebnisse gefunden",
+      "searchByLocationName": "Nach Standortname suchen...",
+      "mode": "Reiseverkehrsmittel",
+      "rangeBy": "Bereich nach",
+      "departure": "Abfahrt",
+      "arrival": "Ankunft",
+      "direction": "Richtung",
+      "reset": "Zurücksetzen",
+      "run": "Ausführen",
+      "buckets": "Eimer",
+      "exportAsGeoJSON": "Als GeoJSON exportieren",
+      "addAsLayer": "Als Ebene hinzufügen",
+      "deleteResult": "Ergebnis löschen",
+      "distance": "Entfernung",
+      "time": "Zeit",
+      "useRunParameters": "Laufparameter verwenden",
+      "notification": {
+        "error": "Isochrone-Fehler",
+        "errorIsochroneError": "Ein Fehler ist beim Berechnen der Isochrone aufgetreten. Bitte versuchen Sie es erneut...",
+        "infoLayerAdded": "Isochrone-Ebene hinzugefügt"
+      },
+      "colors": "Farben",
+      "rampTooltip": "Wählen Sie die Farbpalette für die Eimer",
+      "colorTooltip": "Wählen Sie die Farbe für den Eimer",
+      "confirmDialog": {
+        "title": "Isochrone-Panel schließen",
+        "description": "Sie haben vorhandene Isochrone-Daten. Das Schließen des Panels löscht alle aktuellen Laufdaten. Sind Sie sicher, dass Sie fortfahren möchten?",
+        "confirm": "Bestätigen",
+        "cancel": "Abbrechen"
+      }
     }
   }
 }

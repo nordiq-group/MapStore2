@@ -10,9 +10,9 @@ import React, { useState, useEffect } from "react";
 import uniq from 'lodash/uniq';
 import isEmpty from 'lodash/isEmpty';
 import PropTypes from "prop-types";
+import { Glyphicon } from "react-bootstrap";
 
 import Button from "../../../components/layout/Button";
-import Icon from "./Icon";
 import useLocalStorage from "../hooks/useLocalStorage";
 import Message from "../../../components/I18N/Message";
 import Spinner from "../../../components/layout/Spinner";
@@ -38,7 +38,7 @@ const AccordionTitle = ({
             </FlexBox.Fill>
             {loading
                 ? <Spinner/>
-                : <Icon glyph={`caret-${expanded ? "down" : "left"}`}/>
+                : <Glyphicon glyph={`${expanded ? "bottom" : "back"}`}/>
             }
         </FlexBox>
     );
@@ -85,7 +85,7 @@ const FilterAccordion = ({
         if (loadItems && typeof loadItems === 'function') {
             if (isExpanded && !loading) {
                 setLoading(true);
-                loadItems({ page_size: 999999 })
+                loadItems({ pageSize: 999999 })
                     .then((response) => {
                         isMounted(() => setAccordionItems(response.items));
                     })

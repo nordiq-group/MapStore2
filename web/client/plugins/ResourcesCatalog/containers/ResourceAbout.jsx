@@ -7,18 +7,34 @@
  */
 
 import React, { useEffect, useState, lazy, Suspense } from 'react';
-import axios from '../../../libs/ajax';
-import Message from '../../../components/I18N/Message';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import { Glyphicon } from 'react-bootstrap';
+
+import axios from '../../../libs/ajax';
+import Message from '../../../components/I18N/Message';
 import { getInitialSelectedResource } from '../selectors/resources';
-import { parseNODATA } from '../utils/ResourcesUtils';
+import { parseNODATA, DETAILS_DATA_KEY } from '../../../utils/GeostoreUtils';
 import FlexBox from '../../../components/layout/FlexBox';
-import Icon from '../components/Icon';
 import Text from '../../../components/layout/Text';
 import Spinner from '../../../components/layout/Spinner';
 
 const ResourceAboutEditor = lazy(() => import('./ResourceAboutEditor'));
+
+/**
+ * Checks if a string is a valid resource URL.
+ *
+ * A valid resource URL:
+ * - Ends with `/number` (e.g., `/123`, `/9999`)
+ * - Does NOT contain any HTML tags (e.g., `<p>`, `<div>`)
+ *
+ * @param {string} str - The string to validate.
+ * @returns {boolean} `true` if the string is a valid resource URL; otherwise `false`.
+ */
+const isValidResourceURL = (str) => {
+    const regex = /^(?!.*<[^>]+>).*\/\d+$/;
+    return regex.test(str);
+};
 
 function ResourceAbout({
     detailsUrl,
@@ -26,15 +42,15 @@ function ResourceAbout({
     resource,
     onChange = () => {}
 }) {
-    const details = parseNODATA(resource?.attributes?.details || '');
-    const [about, setAbout] = useState(detailsUrl ? '' : details);
+    const detailsData = resource?.attributes?.[DETAILS_DATA_KEY];
+    const about = isValidResourceURL(detailsData) ? '' : (detailsData || '');
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-        if (detailsUrl) {
+        if (detailsData === undefined && isValidResourceURL(detailsUrl)) {
             setLoading(true);
             axios.get(detailsUrl)
                 .then(({ data }) => {
-                    setAbout(data);
+                    onChange({ [`attributes.${DETAILS_DATA_KEY}`]: data }, true);
                 })
                 .finally(() => {
                     setLoading(false);
@@ -42,14 +58,14 @@ function ResourceAbout({
         } else {
             setLoading(false);
         }
-    }, [detailsUrl]);
+    }, [detailsUrl, detailsData]);
 
     if (loading || (!about && !editing)) {
         return (
             <FlexBox classNames={["ms-details-message", '_padding-tb-lg']} centerChildren>
                 <div>
                     <Text fontSize="xxl" textAlign="center">
-                        {loading ? <Spinner /> : <Icon glyph="sheet" type="glyphicon" />}
+                        {loading ? <Spinner /> : <Glyphicon glyph="sheet" />}
                     </Text>
                     <Text fontSize="lg" textAlign="center">
                         <Message msgId={loading ? 'resourcesCatalog.loadingAbout' : 'resourcesCatalog.noAbout'}/>

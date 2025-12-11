@@ -7,16 +7,14 @@
  */
 
 import React, { forwardRef, useState, useRef, useEffect } from 'react';
-import Message from '../../../components/I18N/Message';
-import Menu from './Menu';
+import { Dropdown, Glyphicon, MenuItem } from 'react-bootstrap';
 
+import Message from '../../../components/I18N/Message';
 import Spinner from '../../../components/layout/Spinner';
-import Icon from './Icon';
 import Button from '../../../components/layout/Button';
-import { Dropdown, MenuItem } from 'react-bootstrap';
 import FlexBox from '../../../components/layout/FlexBox';
 import Text from '../../../components/layout/Text';
-
+import Menu from './Menu';
 const ResourcesListHeader = ({
     columns,
     metadata,
@@ -132,8 +130,10 @@ const ResourcesMenu = forwardRef(({
     columns,
     setColumns,
     metadata,
-    target
+    target,
+    resourcesFoundMsgId = "resourcesCatalog.resourcesFound"
 }, ref) => {
+
 
     const {
         defaultLabelId,
@@ -164,9 +164,10 @@ const ResourcesMenu = forwardRef(({
                             active={value === selectedSort?.value}
                             href={formatHref({
                                 query: {
-                                    sort: [value]
+                                    sort: value
                                 },
-                                replaceQuery: true
+                                replaceQuery: true,
+                                excludeQueryKeys: []
                             })}
                         >
                             <Message msgId={labelId} />
@@ -204,7 +205,7 @@ const ResourcesMenu = forwardRef(({
                     <Text fontSize="sm" ellipsis>
                         {loading
                             ? <Spinner />
-                            : <Message msgId="resourcesCatalog.resourcesFound" msgParams={{ count: totalResources }}/>}
+                            : <Message msgId={resourcesFoundMsgId} msgParams={{ count: totalResources }}/>}
                     </Text>
                 </FlexBox.Fill>
                 <Menu
@@ -219,7 +220,7 @@ const ResourcesMenu = forwardRef(({
                     onClick={handleToggleCardLayoutStyle}
                     square
                 >
-                    <Icon glyph={cardLayoutStyle === 'grid' ? 'th-list' : 'th'} type="glyphicon"/>
+                    <Glyphicon glyph={cardLayoutStyle === 'grid' ? 'th-list' : 'th'} />
                 </Button>}
                 {orderAlign === 'right' ? orderButtonNode : null}
             </FlexBox>

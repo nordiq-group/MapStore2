@@ -113,6 +113,7 @@ export default mapBuilder(({
     enabled, onClose = () => {},
     toggleLayerSelector = () => {},
     editorData = {},
+    addonsItems = [],
     editNode, setEditNode, closeNodeEditor, isLocalizedLayerStylesEnabled, env, selectedGroups = [], exitButton, selectedLayers = [], selectedNodes, onNodeSelect = () => {},
     availableDependencies = [], toggleConnection = () => {}, ...props
 } = {}) =>
@@ -132,10 +133,12 @@ export default mapBuilder(({
     >
         {enabled ? <Builder
             setEditNode={setEditNode}
+            addonsItems={addonsItems}
             editNode={editNode}
             closeNodeEditor={closeNodeEditor}
             onNodeSelect={onNodeSelect}
             isLocalizedLayerStylesEnabled={isLocalizedLayerStylesEnabled}
             env={env}
+            widgetId={editorData.id}
             selectedNodes={selectedNodes} {...props} /> : null}
     </BorderLayout>));

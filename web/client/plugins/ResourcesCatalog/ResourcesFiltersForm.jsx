@@ -7,23 +7,25 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import { createPlugin } from '../../utils/PluginsUtils';
 import url from 'url';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import resourcesReducer from './reducers/resources';
 import FiltersForm from './components/FiltersForm';
-import { getMonitoredStateSelector, getRouterLocation, getShowFiltersForm } from './selectors/resources';
+import { getAvailableResourceTypes, getMonitoredStateSelector, getRouterLocation, getShowFiltersForm } from './selectors/resources';
 import { searchResources, setShowFiltersForm  } from './actions/resources';
 import ResourcesFiltersFormButton from './containers/ResourcesFiltersFormButton';
 import useParsePluginConfigExpressions from './hooks/useParsePluginConfigExpressions';
 import useFilterFacets from './hooks/useFilterFacets';
-import { facetsRequest } from './api/resources';
 import ResourcesPanelWrapper from './components/ResourcesPanelWrapper';
 import TargetSelectorPortal from './components/TargetSelectorPortal';
 import useResourcePanelWrapper from './hooks/useResourcePanelWrapper';
 import { withResizeDetector } from 'react-resize-detector';
 import { userSelector } from '../../selectors/security';
+import { getCatalogFacets } from '../../api/persistence';
+import { isMenuItemSupportedSupported } from '../../utils/ResourcesUtils';
 
 /**
  * This plugin renders a side panel with configurable input filters
@@ -145,22 +147,26 @@ function ResourcesFiltersForm({
                 {
                     id: 'map',
                     labelId: 'resourcesCatalog.mapsFilter',
-                    type: 'filter'
+                    type: 'filter',
+                    resourceType: 'MAP'
                 },
                 {
                     id: 'dashboard',
                     labelId: 'resourcesCatalog.dashboardsFilter',
-                    type: 'filter'
+                    type: 'filter',
+                    resourceType: 'DASHBOARD'
                 },
                 {
                     id: 'geostory',
                     labelId: 'resourcesCatalog.geostoriesFilter',
-                    type: 'filter'
+                    type: 'filter',
+                    resourceType: 'GEOSTORY'
                 },
                 {
                     id: 'context',
                     labelId: 'resourcesCatalog.contextsFilter',
-                    type: 'filter'
+                    type: 'filter',
+                    resourceType: 'CONTEXT'
                 }
             ]
         },
@@ -187,7 +193,6 @@ function ResourcesFiltersForm({
         }
     ],
     monitoredState,
-    customFilters,
     location,
     show,
     targetSelector,
@@ -196,14 +201,18 @@ function ResourcesFiltersForm({
     footerNodeSelector = '#ms-footer',
     width,
     height,
-    user
-}) {
+    user,
+    availableResourceTypes
+}, context) {
 
     const { query } = url.parse(location.search, true);
 
     const parsedConfig = useParsePluginConfigExpressions(monitoredState, {
         extent,
         fields: fieldsProp
+    }, context?.plugins?.requires,
+    {
+        filterFunc: item => isMenuItemSupportedSupported(item, availableResourceTypes, user)
     });
 
     const {
@@ -223,8 +232,8 @@ function ResourcesFiltersForm({
     } = useFilterFacets({
         query,
         fields: parsedConfig.fields,
-        request: facetsRequest,
-        customFilters,
+        request: (...args) => getCatalogFacets(...args).toPromise(),
+        monitoredState,
         visible: !!show
     }, [user]);
 
@@ -251,12 +260,17 @@ function ResourcesFiltersForm({
     );
 }
 
+ResourcesFiltersForm.contextTypes = {
+    plugins: PropTypes.object
+};
+
 const ResourcesGridPlugin = connect(
     createStructuredSelector({
         user: userSelector,
         location: getRouterLocation,
         monitoredState: getMonitoredStateSelector,
-        show: getShowFiltersForm
+        show: getShowFiltersForm,
+        availableResourceTypes: getAvailableResourceTypes
     }),
     {
         onClose: setShowFiltersForm.bind(null, false),
@@ -269,7 +283,15 @@ export default createPlugin('ResourcesFiltersForm', {
     containers: {
         ResourcesGrid: {
             target: 'left-menu',
-            Component: ResourcesFiltersFormButton
+            Component: ResourcesFiltersFormButton,
+            priority: 1,
+            doNotHide: true
+        },
+        ResourcesSearch: {
+            target: 'toolbar',
+            Component: ResourcesFiltersFormButton,
+            priority: 2,
+            doNotHide: true
         }
     },
     epics: {},

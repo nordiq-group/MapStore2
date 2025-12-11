@@ -25,11 +25,14 @@ export default ({
     selectedNodes = [],
     onNodeSelect = () => {},
     editorData = {},
+    addonsItems = [],
     editNode,
     setEditNode = () => {},
     closeNodeEditor = () => {},
     isLocalizedLayerStylesEnabled,
-    env
+    env,
+    widgets = [],
+    widgetId
 } = {}) => {
     const [selectedMap, setSelectedMap] = useState({});
     const [emptyMap, setEmptyMap] = useState(false);
@@ -51,6 +54,7 @@ export default ({
                     onChange={onChange}
                     value={editorData.selectedMapId}
                     setSelectedMap={setSelectedMap}
+                    addonsItems={addonsItems}
                     selectedMap={selectedMap}
                     setEmptyMap={setEmptyMap}
                     emptyMap={emptyMap}
@@ -59,11 +63,14 @@ export default ({
                 {!emptyMap && <MapOptions
                     editNode={editNode}
                     setEditNode={setEditNode}
+                    addonsItems={addonsItems}
                     closeNodeEditor={closeNodeEditor}
                     onNodeSelect={onNodeSelect}
                     selectedNodes={selectedNodes}
                     onChange={onChange}
                     isLocalizedLayerStylesEnabled={isLocalizedLayerStylesEnabled}
+                    widgets={widgets}
+                    widgetId={widgetId}
                     preview={<Preview
                         key={editorData.selectedMapId}
                         onChange={onChange}

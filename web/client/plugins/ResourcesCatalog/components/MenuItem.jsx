@@ -9,11 +9,11 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
+import { Dropdown, Glyphicon, MenuItem as RBMenuItem } from 'react-bootstrap';
+
 import Message from '../../../components/I18N/Message';
 import HTML from '../../../components/I18N/HTML';
-import { Dropdown, MenuItem as RBMenuItem } from 'react-bootstrap';
 import MenuNavLink from './MenuNavLink';
-import Icon from './Icon';
 import Button from '../../../components/layout/Button';
 
 /**
@@ -45,7 +45,7 @@ const DropdownMenuItems = ({
                             target={itm.target ?? target}
                             className={itm.className}
                         >
-                            {itm.glyph ? <Icon glyph={itm.glyph} type={itm.iconType}/> : null}
+                            {itm.glyph ? <Glyphicon glyph={itm.glyph} /> : null}
                             {itm.glyph && labelNode ? ' ' : null}
                             {labelNode}
                         </RBMenuItem>
@@ -94,8 +94,9 @@ const MenuItem = ({
     size,
     alignRight,
     variant,
-    target: defaultTarget,
-    menuItemComponent
+    menuItemComponent,
+    onClick,
+    target: defaultTarget
 }) => {
 
     const {
@@ -144,7 +145,7 @@ const MenuItem = ({
                         ? <img src={src} />
                         : (
                             <>
-                                {glyph ? <Icon glyph={glyph} type={iconType}/> : null}
+                                {glyph ? <Glyphicon glyph={glyph} /> : null}
                                 {glyph && labelNode ? ' ' : null}
                                 {labelNode}
                             </>
@@ -164,7 +165,7 @@ const MenuItem = ({
     if (type === 'link') {
         return (<li>
             <MenuNavLink href={href} target={target}>
-                {glyph ? <Icon glyph={glyph} type={iconType}/> : null}
+                {glyph ? <Glyphicon glyph={glyph} type={iconType}/> : null}
                 {glyph && labelNode ? ' ' : null}
                 {labelNode}
             </MenuNavLink>
@@ -185,6 +186,7 @@ const MenuItem = ({
     if (type === 'button') {
         return (<li>
             <Button
+                onClick={onClick}
                 square={square}
                 tooltipId={tooltipId}
                 variant={variant}
@@ -193,7 +195,7 @@ const MenuItem = ({
                 target={target}
                 borderTransparent
             >
-                {glyph ? <Icon glyph={glyph} type={iconType}/> : null}
+                {glyph ? <Glyphicon glyph={glyph} /> : null}
                 {glyph && labelNode ? ' ' : null}
                 {labelNode}
             </Button>

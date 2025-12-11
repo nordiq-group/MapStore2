@@ -117,12 +117,7 @@ describe('LegendUtils', () => {
                 style: null,
                 version: '1.3.0',
                 SLD_VERSION: '1.1.0',
-                LEGEND_OPTIONS: 'hideEmptyRules:true;fontSize:10',
-                SRCWIDTH: 800,
-                SRCHEIGHT: 600,
-                SRS: 'EPSG:4326',
-                CRS: 'EPSG:4326',
-                BBOX: '-30,20,50,60'
+                LEGEND_OPTIONS: 'fontSize:10'
             });
         });
         it('should return correct WMS legend config for vendor server type with background group', () => {
@@ -131,7 +126,8 @@ describe('LegendUtils', () => {
                 type: 'wms',
                 url: 'http://example.com',
                 serverType: 'VENDOR',
-                group: 'background'
+                group: 'background',
+                enableInteractiveLegend: true
             };
             const config = getWMSLegendConfig({
                 format: LEGEND_FORMAT.IMAGE,
@@ -154,6 +150,141 @@ describe('LegendUtils', () => {
                 version: '1.3.0',
                 SLD_VERSION: '1.1.0',
                 LEGEND_OPTIONS: 'hideEmptyRules:false;fontSize:10',
+                SRCWIDTH: 800,
+                SRCHEIGHT: 600,
+                SRS: 'EPSG:4326',
+                CRS: 'EPSG:4326',
+                BBOX: '-30,20,50,60'
+            });
+        });
+        it('should add bbox when legend viewport filter is enabled', () => {
+            const layer = {
+                name: 'testLayer',
+                type: 'wms',
+                url: 'http://example.com',
+                serverType: 'VENDOR',
+                enableInteractiveLegend: true,
+                enableLegendFilterByViewport: true
+            };
+            const config = getWMSLegendConfig({
+                format: LEGEND_FORMAT.IMAGE,
+                legendHeight: 20,
+                legendWidth: 20,
+                layer,
+                mapSize: { width: 800, height: 600 },
+                projection: 'EPSG:4326',
+                mapBbox: { bounds: { minx: -30, miny: 20, maxx: 50, maxy: 60 }, crs: "EPSG:4326" },
+                legendOptions: 'fontSize:10'
+            });
+            expect(config).toEqual({
+                service: 'WMS',
+                request: 'GetLegendGraphic',
+                format: LEGEND_FORMAT.IMAGE,
+                height: 20,
+                width: 20,
+                layer: 'testLayer',
+                style: null,
+                version: '1.3.0',
+                SLD_VERSION: '1.1.0',
+                LEGEND_OPTIONS: 'hideEmptyRules:true;fontSize:10',
+                SRCWIDTH: 800,
+                SRCHEIGHT: 600,
+                SRS: 'EPSG:4326',
+                CRS: 'EPSG:4326',
+                BBOX: '-30,20,50,60'
+            });
+        });
+        it('should skip content dependent param when dynamic legend is not enabled', () => {
+            const layer = {
+                name: 'testLayer',
+                type: 'wms',
+                url: 'http://example.com',
+                serverType: 'VENDOR',
+                enableDynamicLegend: false
+            };
+            const config = getWMSLegendConfig({
+                format: LEGEND_FORMAT.IMAGE,
+                legendHeight: 20,
+                legendWidth: 20,
+                layer,
+                mapSize: { width: 800, height: 600 },
+                projection: 'EPSG:4326',
+                mapBbox: { bounds: { minx: -30, miny: 20, maxx: 50, maxy: 60 }, crs: "EPSG:4326" },
+                legendOptions: 'fontSize:10'
+            });
+            expect(config).toEqual({
+                service: 'WMS',
+                request: 'GetLegendGraphic',
+                format: LEGEND_FORMAT.IMAGE,
+                height: 20,
+                width: 20,
+                layer: 'testLayer',
+                style: null,
+                version: '1.3.0',
+                SLD_VERSION: '1.1.0',
+                LEGEND_OPTIONS: 'fontSize:10'
+            });
+        });
+        it('should skip bbox when interactive legend is not enabled', () => {
+            const layer = {
+                name: 'testLayer',
+                type: 'wms',
+                url: 'http://example.com',
+                serverType: 'VENDOR',
+                enableInteractiveLegend: false
+            };
+            const config = getWMSLegendConfig({
+                format: LEGEND_FORMAT.IMAGE,
+                legendHeight: 20,
+                legendWidth: 20,
+                layer,
+                mapSize: { width: 800, height: 600 },
+                projection: 'EPSG:4326',
+                mapBbox: { bounds: { minx: -30, miny: 20, maxx: 50, maxy: 60 }, crs: "EPSG:4326" },
+                legendOptions: 'fontSize:10'
+            });
+            expect(config).toEqual({
+                service: 'WMS',
+                request: 'GetLegendGraphic',
+                format: LEGEND_FORMAT.IMAGE,
+                height: 20,
+                width: 20,
+                layer: 'testLayer',
+                style: null,
+                version: '1.3.0',
+                SLD_VERSION: '1.1.0',
+                LEGEND_OPTIONS: 'fontSize:10'
+            });
+        });
+        it('should add content dependent params when dynamic legend is enabled', () => {
+            const layer = {
+                name: 'testLayer',
+                type: 'wms',
+                url: 'http://example.com',
+                serverType: 'VENDOR',
+                enableDynamicLegend: true
+            };
+            const config = getWMSLegendConfig({
+                format: LEGEND_FORMAT.IMAGE,
+                legendHeight: 20,
+                legendWidth: 20,
+                layer,
+                mapSize: { width: 800, height: 600 },
+                projection: 'EPSG:4326',
+                mapBbox: { bounds: { minx: -30, miny: 20, maxx: 50, maxy: 60 }, crs: "EPSG:4326" },
+                legendOptions: 'fontSize:10'
+            });
+            expect(config).toEqual({
+                service: 'WMS',
+                request: 'GetLegendGraphic',
+                format: LEGEND_FORMAT.IMAGE,
+                height: 20,
+                width: 20,
+                layer: 'testLayer',
+                style: null,
+                version: '1.3.0',
+                SLD_VERSION: '1.1.0',
+                LEGEND_OPTIONS: 'hideEmptyRules:true;fontSize:10',
                 SRCWIDTH: 800,
                 SRCHEIGHT: 600,
                 SRS: 'EPSG:4326',
@@ -275,6 +406,67 @@ describe('LegendUtils', () => {
             const CQL_FILTER = "((strToLowerCase(\"STATE_NAME\") LIKE '%mi%')) AND (INTERSECTS(\"the_geom\",SRID=3857;Polygon((-12039795.482942028 6702910.641873448, -12039795.482942028 4384116.951814341, -9045909.959068244 4384116.951814341, -9045909.959068244 6702910.641873448, -12039795.482942028 6702910.641873448))))";
             expect(result[0].name).toBe("layer1");
             expect(result[0].params.CQL_FILTER).toBe(CQL_FILTER);
+        });
+
+        it('should clear CQL_FILTER when quickFilters are missing', () => {
+            const layers = [
+                { name: 'layer1', params: { CQL_FILTER: 'some_filter' } },
+                { name: 'layer2', params: { CQL_FILTER: 'some_filter' } }
+            ];
+            const dependencies = {
+                layer: { name: 'layer1' },
+                filter,
+                mapSync: true,
+                options: {}
+            };
+
+            const result = updateLayerWithLegendFilters(layers, dependencies);
+            expect(result).toBeTruthy();
+            expect(result).toEqual([
+                { name: 'layer1', params: {CQL_FILTER: undefined} },
+                { name: 'layer2', params: {CQL_FILTER: undefined} }
+            ]);
+        });
+
+        it('should skip applying filters when featureTypeName does not match target layer', () => {
+            const layers = [
+                { name: 'layer1', params: { CQL_FILTER: 'some_filter' } },
+                { name: 'layer2', params: { CQL_FILTER: 'some_filter' } }
+            ];
+            const dependencies = {
+                layer: { name: 'layer1' },
+                filter: { ...filter, featureTypeName: 'anotherLayer' },
+                mapSync: true,
+                quickFilters: {},
+                options: {}
+            };
+
+            const result = updateLayerWithLegendFilters(layers, dependencies);
+            expect(result).toBeTruthy();
+            expect(result).toEqual([
+                { name: 'layer1', params: {CQL_FILTER: undefined} },
+                { name: 'layer2', params: {CQL_FILTER: undefined} }
+            ]);
+        });
+
+        it('should clear filters when layer dependency is missing', () => {
+            const layers = [
+                { name: 'layer1', params: { CQL_FILTER: 'some_filter' } },
+                { name: 'layer2', params: { CQL_FILTER: 'some_filter' } }
+            ];
+            const dependencies = {
+                filter,
+                mapSync: true,
+                quickFilters: {},
+                options: {}
+            };
+
+            const result = updateLayerWithLegendFilters(layers, dependencies);
+            expect(result).toBeTruthy();
+            expect(result).toEqual([
+                { name: 'layer1', params: {CQL_FILTER: undefined} },
+                { name: 'layer2', params: {CQL_FILTER: undefined} }
+            ]);
         });
     });
 });

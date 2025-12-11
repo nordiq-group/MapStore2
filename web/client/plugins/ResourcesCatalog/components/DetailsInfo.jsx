@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import castArray from 'lodash/castArray';
 import isEmpty from 'lodash/isEmpty';
 import moment from 'moment';
@@ -20,7 +20,7 @@ import ALink from './ALink';
 import FlexBox from '../../../components/layout/FlexBox';
 import Text from '../../../components/layout/Text';
 import InputControl from './InputControl';
-import { getTagColorVariables } from '../utils/ResourcesFiltersUtils';
+import { getTagColorVariables } from '../../../utils/ResourcesFiltersUtils';
 
 const replaceTemplateString = (properties, str) => {
     return Object.keys(properties).reduce((updatedStr, key) => {
@@ -58,7 +58,7 @@ function DetailsInfoField({ field, children, className }) {
     const values = castArray(field.value);
     const isLinkLabel = isFieldLabelOnly(field);
     return (
-        <FlexBox gap="sm" classNames={['_padding-b-xs', '_row']} className={className}>
+        <FlexBox gap="sm" classNames={['ms-details-info-field', '_padding-b-xs', '_row']} className={className}>
             <Text className={isLinkLabel ? '' : '_label'} fontSize="sm"><DetailInfoFieldLabel field={field} /></Text>
             {!isLinkLabel ? <FlexBox.Fill>
                 <Text fontSize="sm">{children(values)}</Text>
@@ -191,16 +191,21 @@ function DetailsInfoFields({ fields, formatHref, editing, onChange, query = {}, 
                 return (
                     <DetailsInfoField key={filedIndex} field={field}>
                         {(values) => values.map((value, idx) => (
-                            <ALink key={idx} href={enableFilters ? formatHref({
-                                query: field.queryTemplate
-                                    ? Object.keys(field.queryTemplate)
-                                        .reduce((acc, key) => ({
-                                            ...acc,
-                                            [key]: replaceTemplateString(value, field.queryTemplate[key])
-                                        }), {})
-                                    : field.query,
-                                pathname: field.pathname
-                            }) : undefined}>{field.valueKey ? value[field.valueKey] : value}</ALink>
+                            <ALink
+                                key={idx}
+                                fallbackComponent="span"
+                                href={enableFilters ? formatHref({
+                                    query: field.queryTemplate
+                                        ? Object.keys(field.queryTemplate)
+                                            .reduce((acc, key) => ({
+                                                ...acc,
+                                                [key]: replaceTemplateString(value, field.queryTemplate[key])
+                                            }), {})
+                                        : field.query,
+                                    pathname: field.pathname
+                                }) : undefined}>
+                                {field.valueKey ? value[field.valueKey] : value}
+                            </ALink>
                         ))}
                     </DetailsInfoField>
                 );
@@ -284,6 +289,8 @@ function DetailsInfo({
     tabs = [],
     tabComponents: tabComponentsProp,
     className,
+    selectedTab,
+    onSelectTab = () => {},
     ...props
 }) {
 
@@ -301,12 +308,18 @@ function DetailsInfo({
                 Component: tabComponents[tab.type] || tabComponents.tab
             }))
         .filter(tab => !isEmpty(tab?.items));
-    const [selectedTabId, onSelect] = useState(filteredTabs?.[0]?.id);
+
+    useEffect(() => {
+        return () => {
+            onSelectTab(filteredTabs?.[0]?.id);
+        };
+    }, []);
+
     return (
         <Tabs
             className={`ms-details-info tabs-underline${className ? ` ${className}` : ''}`}
-            selectedTabId={selectedTabId}
-            onSelect={onSelect}
+            selectedTabId={selectedTab ?? filteredTabs?.[0]?.id}
+            onSelect={onSelectTab}
             tabs={filteredTabs.map(({Component, ...tab} = {}) => ({
                 title: <DetailInfoFieldLabel field={tab} />,
                 eventKey: tab?.id,

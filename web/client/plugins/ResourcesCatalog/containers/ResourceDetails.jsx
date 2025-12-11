@@ -7,45 +7,26 @@
  */
 
 import React, { useRef } from 'react';
-import { Alert } from 'react-bootstrap';
+import url from 'url';
+import PropTypes from 'prop-types';
+import {isEmpty, isNull} from 'lodash';
+import { Alert, Glyphicon } from 'react-bootstrap';
+
 import useRequestResource from '../hooks/useRequestResource';
 import DetailsInfo from '../components/DetailsInfo';
 import ButtonMS from '../../../components/layout/Button';
-import Icon from '../components/Icon';
-import { getResourceTypesInfo, getResourceId } from '../utils/ResourcesUtils';
+import { isMenuItemSupportedSupported, replaceResourcePaths } from '../../../utils/ResourcesUtils';
 import DetailsHeader from '../components/DetailsHeader';
-import { isEmpty, isArray, isObject, get } from 'lodash';
 import useParsePluginConfigExpressions from '../hooks/useParsePluginConfigExpressions';
-import { hashLocationToHref } from '../utils/ResourcesFiltersUtils';
-import url from 'url';
+import { hashLocationToHref } from '../../../utils/ResourcesFiltersUtils';
 import FlexBox from '../../../components/layout/FlexBox';
 import Text from '../../../components/layout/Text';
 import Spinner from '../../../components/layout/Spinner';
 import Message from '../../../components/I18N/Message';
 import tooltip from '../../../components/misc/enhancers/tooltip';
+import { computeSaveResource, THUMBNAIL_DATA_KEY } from '../../../utils/GeostoreUtils';
 
 const Button = tooltip(ButtonMS);
-
-const replaceResourcePaths = (value, resource, facets) => {
-    if (isArray(value)) {
-        return value.map(val => replaceResourcePaths(val, resource, facets));
-    }
-    if (isObject(value)) {
-        if (value.path || value.facet) {
-            const facet = facets.find(fc => fc.id === value.facet);
-            return {
-                ...facet,
-                ...value,
-                ...(value.path && { value: get(resource, value.path) })
-            };
-        }
-        return Object.keys(value).reduce((acc, key) => ({
-            ...acc,
-            [key]: replaceResourcePaths(value[key], resource, facets)
-        }), {});
-    }
-    return value;
-};
 
 function ResourceDetails({
     user,
@@ -54,6 +35,7 @@ function ResourceDetails({
     onSelect,
     onChange,
     pendingChanges,
+    resourceInfo,
     tabs = [],
     editing,
     setEditing,
@@ -69,10 +51,16 @@ function ResourceDetails({
     updateRequest,
     facets,
     resourceType,
-    enableFilters
-}) {
+    enableFilters,
+    onSelectTab,
+    selectedTab,
+    availableResourceTypes
+}, context) {
 
-    const parsedConfig = useParsePluginConfigExpressions(monitoredState, { tabs });
+    const parsedConfig = useParsePluginConfigExpressions(monitoredState, { tabs }, context?.plugins?.requires,
+        {
+            filterFunc: item => isMenuItemSupportedSupported(item, availableResourceTypes, user)
+        });
 
     const {
         resource,
@@ -80,7 +68,7 @@ function ResourceDetails({
         updating,
         update: handleUpdateResource
     } = useRequestResource({
-        resourceId: getResourceId(resourceProp),
+        resourceId: resourceProp?.id,
         user,
         resource: resourceProp,
         setRequest,
@@ -115,8 +103,8 @@ function ResourceDetails({
         });
     }
 
-    function handleOnChange(options) {
-        onChange(options, resourcesGridId);
+    function handleOnChange(options, initialize) {
+        onChange(options, initialize, resourcesGridId);
     }
 
     // resource details component can be used with the resources grid (resourceType equal to undefined)
@@ -133,35 +121,36 @@ function ResourceDetails({
                 editing={editing}
                 tools={
                     <FlexBox centerChildrenVertically gap="sm">
-                        {!isSpecificResourceType && editing ? <Button
-                            tooltipId="resourcesCatalog.apply"
-                            className={isEmpty(pendingChanges?.changes) ? undefined : 'ms-notification-circle warning'}
-                            disabled={isEmpty(pendingChanges?.changes)}
-                            onClick={() => handleUpdateResource(pendingChanges.saveResource)}
-                        >
-                            <Icon glyph="floppy-disk" type="glyphicon" />
-                        </Button> : null}
-                        {canEditResource ? <Button
-                            tooltipId="resourcesCatalog.editResourceProperties"
-                            square
-                            variant={editing ? 'success' : undefined}
-                            onClick={() => onToggleEditing()}
-                        >
-                            <Icon glyph="edit" type="glyphicon" />
-                        </Button> : null}
+                        {!isNull(user) && <>
+                            {!isSpecificResourceType && editing ? <Button
+                                tooltipId="resourcesCatalog.apply"
+                                className={isEmpty(pendingChanges) ? undefined : 'ms-notification-circle warning'}
+                                disabled={isEmpty(pendingChanges)}
+                                onClick={() => handleUpdateResource(computeSaveResource(resourceInfo.initialResource, resourceInfo.resource, resourceInfo.data))}
+                            >
+                                {updating ? <Spinner /> : <Glyphicon glyph="floppy-disk" />}
+                            </Button> : null}
+                            {canEditResource ? <Button
+                                tooltipId="resourcesCatalog.editResourceProperties"
+                                square
+                                variant={editing ? 'success' : undefined}
+                                onClick={() => onToggleEditing()}
+                            >
+                                <Glyphicon glyph="edit" />
+                            </Button> : null}
+                        </>}
                     </FlexBox>
                 }
                 loading={loading}
-                getResourceTypesInfo={getResourceTypesInfo}
                 onClose={() => onClose()}
-                onChangeThumbnail={(thumbnail) => handleOnChange({ attributes: { thumbnail } })}
+                onChangeThumbnail={(thumbnail) => handleOnChange({ [`attributes.${THUMBNAIL_DATA_KEY}`]: thumbnail })}
             />
             {error ? <Alert className="_margin-md _padding-sm" bsStyle="danger">
                 <Message msgId={`resourcesCatalog.resourceError.${error}`}/>
             </Alert> : null}
             {!loading ? <DetailsInfo
                 className="_padding-lr-md"
-                key={getResourceId(resource)}
+                key={resource?.id}
                 tabs={replaceResourcePaths(parsedConfig.tabs, resource, facets)}
                 editing={editing}
                 tabComponents={tabComponents}
@@ -172,6 +161,8 @@ function ResourceDetails({
                 onChange={handleOnChange}
                 resource={resource || {}}
                 enableFilters={enableFilters}
+                onSelectTab={onSelectTab}
+                selectedTab={selectedTab}
             /> : null}
             {(updating || loading) ? <FlexBox centerChildren classNames={['_absolute', '_fill', '_overlay', '_corner-tl']}>
                 <Text fontSize="xxl">
@@ -181,5 +172,9 @@ function ResourceDetails({
         </div>
     );
 }
+
+ResourceDetails.contextTypes = {
+    plugins: PropTypes.object
+};
 
 export default ResourceDetails;

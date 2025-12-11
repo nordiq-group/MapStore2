@@ -7,13 +7,13 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { FormControl as FormControlRB, Glyphicon, Nav, NavItem } from 'react-bootstrap';
+
 import Message from '../../../components/I18N/Message';
-import { FormControl as FormControlRB, Nav, NavItem } from 'react-bootstrap';
 import Popover from '../../../components/styleeditor/Popover';
 import Button from '../../../components/layout/Button';
 import PermissionsAddEntriesPanel from './PermissionsAddEntriesPanel';
 import PermissionsRow from './PermissionsRow';
-import Icon from './Icon';
 import localizedProps from '../../../components/misc/enhancers/localizedProps';
 import FlexBox from '../../../components/layout/FlexBox';
 import Text from '../../../components/layout/Text';
@@ -29,12 +29,11 @@ function Permissions({
     entriesTabs = [],
     loading,
     permissionOptions,
-    permissionsToLists = (value) => value,
-    listsToPermissions = (value) => value,
-    showGroupsPermissions = true
+    showGroupsPermissions = true,
+    tools = []
 }) {
 
-    const { entries = [], groups = [] } = permissionsToLists(compactPermissions);
+    const { entries = [], groups = [] } = compactPermissions;
     const [activeTab, setActiveTab] = useState(entriesTabs?.[0]?.id || '');
     const [permissionsEntires, setPermissionsEntires] = useState(entries);
     const [permissionsGroups, setPermissionsGroups] = useState(groups);
@@ -43,11 +42,11 @@ function Permissions({
     const [filter, setFilter] = useState('');
 
     function handleChange(newValues) {
-        onChange(listsToPermissions({
+        onChange({
             entries: permissionsEntires,
             groups: permissionsGroups,
             ...newValues
-        }));
+        });
     }
 
     function handleUpdateGroup(groupId, properties) {
@@ -155,7 +154,7 @@ function Permissions({
                                                 <Text>
                                                     {item.avatar
                                                         ? <img src={item.avatar}/>
-                                                        : <Icon glyph={item.type} />}
+                                                        : <Glyphicon glyph={item.type} />}
                                                 </Text>
                                                 <ALink
                                                     href={item.link}>
@@ -193,7 +192,7 @@ function Permissions({
                             onChange={event => setFilter(event.target.value)}
                         />
                         {filter && <Button onClick={() => setFilter('')}>
-                            <Icon glyph="times"/>
+                            <Glyphicon glyph="remove"/>
                         </Button>}
                     </FlexBox.Fill>}
                     {editing ? <Popover
@@ -237,7 +236,7 @@ function Permissions({
                             </FlexBox>
                         }>
                         <Button variant={'primary'} size="sm">
-                            <Icon glyph="plus" />{' '}<Message msgId="resourcesCatalog.addPermissionsEntry"/>
+                            <Glyphicon glyph="plus" />{' '}<Message msgId="resourcesCatalog.addPermissionsEntry"/>
                         </Button>
                     </Popover> : null}
                 </FlexBox>
@@ -245,13 +244,13 @@ function Permissions({
                     <FlexBox.Fill>
                         <Button borderTransparent onClick={sortEntries.bind(null, 'name')}>
                             <Message msgId="resourcesCatalog.permissionsName"/>
-                            {order[0] === 'name' && <>{' '}<Icon glyph={order[1] ? 'chevron-up' : 'chevron-down'} /></>}
+                            {order[0] === 'name' && <>{' '}<Glyphicon glyph={order[1] ? 'chevron-up' : 'chevron-down'} /></>}
                         </Button>
                     </FlexBox.Fill>
                     <div className="ms-permissions-column">
                         <Button borderTransparent onClick={sortEntries.bind(null, 'permissions')}>
                             <Message msgId="resourcesCatalog.permissions"/>
-                            {order[0] === 'permissions' && <>{' '}<Icon glyph={order[1] ? 'chevron-up' : 'chevron-down'} /></>}
+                            {order[0] === 'permissions' && <>{' '}<Glyphicon glyph={order[1] ? 'chevron-up' : 'chevron-down'} /></>}
                         </Button>
                     </div>
                 </FlexBox> : null}
@@ -266,12 +265,13 @@ function Permissions({
                                 <PermissionsRow
                                     {...entry}
                                     onChange={editing ? handleUpdateEntry.bind(null, entry.id) : null}
-                                    options={permissionOptions?.default}
+                                    options={permissionOptions?.[`entry.name.${entry.name}`] || permissionOptions?.default}
                                 >
                                     {entry.permissions !== 'owner' && editing ?
                                         <>
+                                            {tools.map(({ Component, name }) => (<Component key={name} entry={entry} onUpdate={handleUpdateEntry} />))}
                                             <Button onClick={handleRemoveEntry.bind(null, entry)}>
-                                                <Icon glyph="trash" />
+                                                <Glyphicon glyph="trash" />
                                             </Button>
                                         </>
                                         : null}

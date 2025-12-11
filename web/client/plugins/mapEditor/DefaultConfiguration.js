@@ -49,6 +49,15 @@ export default {
             }
         },
         {
+            "name": "SecurityPopup",
+            "override": {
+                "MetadataExplorer": {
+                    // this priority is used to ensure that the main component is not included
+                    "priority": 1
+                }
+            }
+        },
+        {
             "name": "TOC",
             "cfg": {
                 "activateQueryTool": false,
@@ -63,7 +72,13 @@ export default {
                 "activateLayerFilterTool": false
             }
         },
-        "AddGroup", "MapFooter",
+        "AddGroup",
+        {
+            "name": "MapFooter",
+            "cfg": {
+                "containerPosition": "footer"
+            }
+        },
         "TOCItemsSettings",
         "MapImport",
         "MapExport",
@@ -139,7 +154,12 @@ export default {
             }
         },
         "OmniBar",
-        "BurgerMenu",
+        {
+            "name": "SidebarMenu",
+            "cfg": {
+                "containerPosition": "columns"
+            }
+        },
         "Expander",
         "Undo",
         "Redo",
@@ -149,5 +169,6 @@ export default {
                 "containerClassName": "map-editor-search-config"
             }
         },
-        "FeedbackMask"]
+        "FeedbackMask"
+    ]
 };

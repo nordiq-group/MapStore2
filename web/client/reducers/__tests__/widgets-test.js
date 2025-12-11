@@ -35,6 +35,7 @@ import widgets from '../widgets';
 import { getFloatingWidgets, getVisibleFloatingWidgets, getCollapsedIds } from '../../selectors/widgets';
 import expect from 'expect';
 import { find, get } from 'lodash';
+import { refreshSecurityLayers } from '../../actions/security';
 
 describe('Test the widgets reducer', () => {
     it('initial state', () => {
@@ -262,15 +263,42 @@ describe('Test the widgets reducer', () => {
 
     it('configureMap with no widgetsConfig', () => {
         const state = widgets(undefined, configureMap({}));
-        expect(state.containers[DEFAULT_TARGET].widgets).toBeFalsy();
+        expect(state.containers[DEFAULT_TARGET].widgets).toEqual([]);
     });
     it('configureMap with empty object widgetsConfig', () => {
         const state = widgets(undefined, configureMap({widgetsConfig: {}}));
-        expect(state.containers[DEFAULT_TARGET].widgets).toBeFalsy({});
+        expect(state.containers[DEFAULT_TARGET].widgets).toEqual([]);
     });
     it('configureMap with empty widgets in widgetsConfig', () => {
         const state = widgets(undefined, configureMap({widgetsConfig: { widgets: []}}));
         expect(state.containers[DEFAULT_TARGET].widgets).toEqual([]);
+    });
+    it('configureMap with valid widgetsConfig containing layout and layouts', () => {
+        const widgetsConfig = {
+            widgets: [
+                { id: "widget1", type: "text", title: "Test Widget 1" },
+                { id: "widget2", type: "chart", title: "Test Widget 2" }
+            ],
+            layout: [
+                { i: "widget1", x: 0, y: 0, w: 4, h: 2 },
+                { i: "widget2", x: 4, y: 0, w: 4, h: 2 }
+            ],
+            layouts: {
+                lg: [
+                    { i: "widget1", x: 0, y: 0, w: 4, h: 2 },
+                    { i: "widget2", x: 4, y: 0, w: 4, h: 2 }
+                ]
+            }
+        };
+        const state = widgets(undefined, configureMap({ widgetsConfig }));
+
+        expect(state.containers[DEFAULT_TARGET]).toExist();
+        expect(state.containers[DEFAULT_TARGET].widgets).toExist();
+        expect(state.containers[DEFAULT_TARGET].widgets.length).toBe(2);
+        expect(state.containers[DEFAULT_TARGET].widgets[0].id).toBe("widget1");
+        expect(state.containers[DEFAULT_TARGET].widgets[1].id).toBe("widget2");
+        expect(state.containers[DEFAULT_TARGET].layout).toEqual(widgetsConfig.layout);
+        expect(state.containers[DEFAULT_TARGET].layouts).toEqual(widgetsConfig.layouts);
     });
     it('changeLayout', () => {
         const L = {lg: []};
@@ -497,5 +525,33 @@ describe('Test the widgets reducer', () => {
         }, toggleMaximize(widgetToMaximize));
 
         expect(resultState).toEqual(initialState);
+    });
+    it('widgets refreshSecurityLayers', () => {
+
+        const resultState = widgets({
+            containers: {
+                floating: {
+                    widgets: [{
+                        id: 'a7122cc0-f7a9-11e8-8602-03b7e0c9537b',
+                        maps: [{
+                            layers: [{
+                                security: {}
+                            }]
+                        }]
+                    }]
+                }
+            },
+            builder: {
+                editor: {
+                    maps: [{
+                        layers: [{
+                            security: {}
+                        }]
+                    }]
+                }
+            }
+        }, refreshSecurityLayers());
+        expect(resultState.containers.floating.widgets[0].maps[0].layers[0].security.rand).toBeTruthy();
+        expect(resultState.builder.editor.maps[0].layers[0].security.rand).toBeTruthy();
     });
 });

@@ -8,13 +8,14 @@
 
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../../../components/layout/Button';
-import Message from '../../../components/I18N/Message';
-import Icon from './Icon';
 import isEqual from 'lodash/isEqual';
-import FilterItems from './FilterItems';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
+import { Glyphicon } from 'react-bootstrap';
+
+import Button from '../../../components/layout/Button';
+import Message from '../../../components/I18N/Message';
+import FilterItems from './FilterItems';
 import FlexBox from '../../../components/layout/FlexBox';
 import Text from '../../../components/layout/Text';
 
@@ -50,8 +51,8 @@ function FiltersForm({
         >
             <FlexBox classNames={['ms-main-colors', '_padding-md', '_sticky', '_corner-tl']} centerChildrenVertically gap="sm">
                 <FlexBox.Fill>
-                    <Text ellipsis >
-                        <Icon glyph="filter" />{' '}<Message msgId="resourcesCatalog.filters" />
+                    <Text ellipsis fontSize="md">
+                        <Message msgId="resourcesCatalog.filters" />
                     </Text>
                 </FlexBox.Fill>
                 <Button
@@ -68,7 +69,7 @@ function FiltersForm({
                     square
                     borderTransparent
                 >
-                    <Icon glyph="1-close" type="glyphicon"/>
+                    <Glyphicon glyph="1-close" />
                 </Button>
             </FlexBox>
             <FlexBox

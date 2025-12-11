@@ -145,8 +145,8 @@ describe('Login Plugin', () => {
             ReactDOM.render(<Plugin isUsingLDAP displayName="name"  />, document.getElementById("container"));
             expect(document.querySelector('#mapstore-login-menu .glyphicon-user')).toBeTruthy();
             const entries = document.querySelectorAll("#mapstore-login-menu ~ ul li[role=\"presentation\"]");
-            expect(entries.length).toEqual(4);
-            expect([...entries].map(entry => entry.innerText)).toEqual(['user.info', 'user.changePwd', 'users.title', 'user.logout']);
+            expect(entries.length).toEqual(7);
+            expect([...entries].map(entry => entry.innerText)).toEqual(['user.info', 'user.changePwd', 'users.title', 'usergroups.title', 'resourcesCatalog.manageTags', 'resourcesCatalog.manageIPs', 'user.logout']);
         });
         it('test show change password in case ms user ', () => {
             const storeState = stateMocker(toggleControl('LoginForm', 'enabled'), loginSuccess({  User: { name: "Test", access_token: "some-token", role: 'USER' }}) );
@@ -180,6 +180,22 @@ describe('Login Plugin', () => {
             expect(document.querySelector('#mapstore-navbar-container .glyphicon-user')).toBeTruthy();
             const entries = document.querySelectorAll("#mapstore-navbar-container ul li[role=\"presentation\"]");
             expect(entries.length).toEqual(1); // only user.logout
+        });
+        it('openID automatic login is mapped when 1 provider only is present', () => {
+            const spyOn = {
+                goToPage: () => {}
+            };
+            expect.spyOn(spyOn, 'goToPage');
+            ConfigUtils.setConfigProp("authenticationProviders", [{type: "openID", provider: "oidc", goToPage: spyOn.goToPage}]); // goToPage is normally empty, but can be used to mock the redirect in tests
+
+            const { Plugin } = getPluginForTest(Login, {});
+            const { Plugin: OmniBarPlugin } = getPluginForTest(OmniBar, {}, { LoginPlugin: Login });
+            TestUtils.act(() => {
+                ReactDOM.render(<OmniBarPlugin items={[{ ...Login.LoginPlugin.OmniBar, plugin: Plugin.LoginPlugin}]} />, document.getElementById("container"));
+            });
+            document.querySelector("#mapstore-navbar-container > div > ul > li > a").click();
+            expect(spyOn.goToPage).toHaveBeenCalled();
+            expect(spyOn.goToPage.calls[0].arguments[0]).toEqual(`/rest/geostore/openid/oidc/login`);
         });
         it('openID with userInfo configured', () => {
             ConfigUtils.setConfigProp("authenticationProviders", [{type: "openID", provider: "google", showAccountInfo: true}]);
