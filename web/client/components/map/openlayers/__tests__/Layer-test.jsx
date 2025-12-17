@@ -976,6 +976,40 @@ describe('Openlayers layer', () => {
         expect(map.getLayers().item(0).getSource().urls.length).toBe(2);
     });
 
+    it('allows wmts url-parameters to be added to url', () => {
+        var options = {
+            "type": "wmts",
+            "visibility": true,
+            "name": "nurc:Arc_Sample",
+            "group": "Meteo",
+            "format": "image/png",
+            "params": {
+                "myparam1": "myvalue1",
+                "myparam2": "myvalue2"
+            },
+            "tileMatrixSet": [
+                {
+                    "TileMatrix": [],
+                    "ows:Identifier": "EPSG:900913",
+                    "ows:SupportedCRS": "urn:ogc:def:crs:EPSG::900913"
+                }
+            ],
+            "url": ["http://sample.server/geoserver/gwc/service/wmts"]
+        };
+        // create layer
+        var layer = ReactDOM.render(
+            <OpenlayersLayer type="wmts"
+                options={options} map={map}/>, document.getElementById("container"));
+
+
+        expect(layer).toBeTruthy();
+        // count layers
+        expect(map.getLayers().getLength()).toBe(1);
+        const url = map.getLayers().item(0).getSource().urls[0];
+        expect(url.includes('myparam1=myvalue1')).toBe(true);
+        expect(url.includes('myparam2=myvalue2')).toBe(true);
+    });
+
     it('creates a wms layer for openlayers map with custom tileSize', () => {
         var options = {
             "type": "wms",
