@@ -220,7 +220,9 @@ class MapPlugin extends React.Component {
         mapTitle: PropTypes.string,
         coalesceWMSLayers: PropTypes.bool,
         coalesceWMSLayersMaxGroupSize: PropTypes.number,
-        coalesceExcludeIds: PropTypes.array
+        coalesceExcludeIds: PropTypes.array,
+        registerHooks: PropTypes.bool,
+        hookRegister: PropTypes.func
     };
 
     static defaultProps = {
@@ -259,7 +261,9 @@ class MapPlugin extends React.Component {
         onLoadingMapPlugins: () => {},
         onMapTypeLoaded: () => {},
         pluginsCreator,
-        coalesceWMSLayersMaxGroupSize: 10
+        coalesceWMSLayersMaxGroupSize: 10,
+        registerHooks: true,
+        hookRegister: undefined
     };
 
     state = {};
@@ -436,6 +440,10 @@ class MapPlugin extends React.Component {
     render() {
         if (this.isValidMapConfiguration(this.props.map) && this.state.plugins) {
             const {mapOptions = {}} = this.props.map;
+            const hookRegisterOptions = { registerHooks: this.props.registerHooks };
+            if (this.props.hookRegister) {
+                hookRegisterOptions.registerHooks = this.props.hookRegister;
+            }
 
             return (
                 <this.state.plugins.Map id={MAIN_MAP_CONTAINER_ID}
@@ -446,6 +454,7 @@ class MapPlugin extends React.Component {
                     zoomControl={this.props.zoomControl}
                     onResolutionsChange={this.props.onResolutionsChange}
                     errorPanel={ErrorPanel}
+                    {...hookRegisterOptions}
                 >
                     {this.renderLayers()}
                     {this.renderSupportTools()}
